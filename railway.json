@@ -5,7 +5,7 @@
     "buildCommand": "cd server && npm install && npm run build && cp -r data dist/data"
   },
   "deploy": {
-    "startCommand": "cd server && npm start",
+    "startCommand": "cd server && node dist/src/index.js",
     "restartPolicyType": "ON_FAILURE"
   }
 }
