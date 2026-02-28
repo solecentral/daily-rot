@@ -6,6 +6,7 @@
   },
   "deploy": {
     "startCommand": "cd server && npm start",
-    "restartPolicyType": "ON_FAILURE"
+    "restartPolicyType": "ON_FAILURE",
+    "healthcheckPath": "/api/stats"
   }
 }

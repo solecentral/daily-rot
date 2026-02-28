@@ -3,7 +3,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import path from 'path'
 
-dotenv.config({ path: path.join(__dirname, '../../.env') })
+dotenv.config()
 
 import subscriberRoutes from './routes/subscribers'
 import issueRoutes from './routes/issues'
