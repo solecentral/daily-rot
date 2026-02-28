@@ -1,0 +1,116 @@
+[
+  {
+    "id": "issue_001",
+    "issueNumber": 1,
+    "subject": "🔥 Issue #1: The One Where The Internet Lost Its Mind (Again)",
+    "scheduledFor": "2026-01-15T08:00:00Z",
+    "sentAt": "2026-01-15T08:01:33Z",
+    "status": "sent",
+    "content": {
+      "rotReport": [
+        {
+          "title": "Man Tries to Sell His Shadow on eBay, Gets 47 Bids",
+          "description": "A Florida man (naturally) listed his shadow for auction on eBay starting at $1. The listing description read: 'Genuine American shadow, barely used, follows me everywhere, open to reasonable offers.' It reached $340 before eBay took it down for 'listing a non-physical item.' The bidders are reportedly devastated."
+        },
+        {
+          "title": "Sigma Grindset Fail Compilation Hits 400M Views",
+          "description": "A 47-minute compilation of men trying to embody the 'sigma grindset' and immediately failing — falling off skateboards mid-speech, dropping their protein shakers during monologues about discipline, and one guy whose 'wolf pack' consists of three Roombas — has become the most watched video of the year. The creator made $180k from it. He is, ironically, now very sigma."
+        },
+        {
+          "title": "Local Man Finishes Duolingo Streak, Tries to Order Coffee in Klingon",
+          "description": "After maintaining a 847-day Duolingo streak across 14 languages, Dave from Ohio walked into a Starbucks and ordered a venti oat milk latte entirely in Klingon. The barista, a linguistics PhD dropout, responded in perfect Klingon. They are now engaged."
+        }
+      ],
+      "memeOfTheDay": {
+        "description": "The 'This is fine' dog but the fire is labeled 'my sleep schedule' and the dog is labeled 'me at 3am watching a 6-hour documentary about the Byzantine Empire for no reason'",
+        "imageUrl": null
+      },
+      "seriousNewsStupid": {
+        "headline": "Scientists Discover New Species of Deep Sea Fish That Looks Extremely Stressed",
+        "take": "Researchers at the Monterey Bay Aquarium have discovered a new blobfish-adjacent species at 4,000 meters deep that appears to have the facial expression of someone who just checked their bank account after the holidays. Marine biologists describe it as 'deeply relatable.' The fish has been named Sigmus stressicus. It has already been made into a meme template."
+      },
+      "whoGotCooked": {
+        "who": "That crypto bro who said Bitcoin would hit $500k by December",
+        "what": "Posted a 3,000-word thread in January about his 'ironclad thesis' and why Bitcoin would definitely hit $500k by December. December came. December went. Bitcoin did not. His thread is still up. The ratio is immaculate. He has since pivoted to posting about 'the power of failure' and 'lessons learned.' The internet has not forgotten."
+      },
+      "unhingedFact": "Cleopatra lived closer in time to the Moon landing than to the construction of the Great Pyramid. Also, a group of flamingos is called a 'flamboyance,' which is the most accurate animal group name ever assigned. Also also, humans share 60% of their DNA with bananas, which explains a lot about some people you know."
+    },
+    "recipientCount": 847
+  },
+  {
+    "id": "issue_002",
+    "issueNumber": 2,
+    "subject": "💀 Issue #2: Wednesday's Chaos Report (Nobody Asked For This)",
+    "scheduledFor": "2026-01-22T08:00:00Z",
+    "sentAt": "2026-01-22T08:00:47Z",
+    "status": "sent",
+    "content": {
+      "rotReport": [
+        {
+          "title": "Rizzler Convention Draws 15,000 Attendees, Zero Rizz",
+          "description": "The first annual 'RizzCon' — a convention for self-described 'rizz masters' — was held in Las Vegas this weekend. Attendance was 15,000. The venue's bar reported the worst sales in its 20-year history. Attendees spent most of the time on their phones. The keynote speaker's mic cut out mid-sentence. Event organizers called it 'a massive W.' Everyone else called it something else."
+        },
+        {
+          "title": "NPC Streamer Goes AFK Mid-Stream, Viewers Send $800 in Donations to Get Her Back",
+          "description": "Twitch's most popular NPC streamer accidentally fell asleep mid-stream while doing her 'I'm an NPC' bit. Her chat, unable to tell if it was part of the act, spent 40 minutes sending donations with wake-up messages. She woke up at $820 in donations, said 'bing bong,' and the chat exploded. She's now calling it a 'sleep arc.'"
+        },
+        {
+          "title": "Guy Spends 6 Months Building Perfect Morning Routine, Wakes Up at Noon",
+          "description": "A self-improvement influencer with 2M followers documented his 6-month journey building the 'ultimate morning routine' — cold plunge, journaling, 5am wake-up, no phone for an hour. Posted his final video titled 'My Life Has Changed.' Woke up at 12:17pm the next day. Posted a follow-up called 'Balance is Key.' Both videos have millions of views."
+        }
+      ],
+      "memeOfTheDay": {
+        "description": "SpongeBob waking up at 6am looking absolutely feral with the caption 'day 1 of my new life' vs SpongeBob at 6:03am opening TikTok with the caption 'day 1 cancelled'",
+        "imageUrl": null
+      },
+      "seriousNewsStupid": {
+        "headline": "Tech CEO Announces Company Will Move to 4-Day Work Week",
+        "take": "A Bay Area tech startup announced it's moving to a 4-day work week to 'improve work-life balance and employee wellbeing.' The CEO posted about it on LinkedIn and got 40,000 likes. What the press release didn't mention: the four days are Monday through Thursday, 9am to 9pm. The 12-hour days are described in the internal memo as an 'intensity optimization.' Three employees have already quit."
+      },
+      "whoGotCooked": {
+        "who": "The guy who posted 'nobody works harder than me' on LinkedIn",
+        "what": "Posted a LinkedIn brag about working 80-hour weeks and 'outworking everyone.' His former coworkers flooded the comments with specific, detailed, timestamped evidence to the contrary, including a legendary reply from his ex-boss that simply read: 'Timothy. Buddy. I have the attendance records.' Timothy's account went private. Timothy is doing fine, probably."
+      },
+      "unhingedFact": "The inventor of the Pringles can is buried in one. Julius Pringles (not a real person, but stay with me — the actual inventor, Fredric Baur) had his ashes stored in a Pringles can at his family's request. Once you pop, you literally cannot stop. Also: a snail can sleep for 3 years. Some of you are jealous of this snail."
+    },
+    "recipientCount": 1203
+  },
+  {
+    "id": "issue_003",
+    "issueNumber": 3,
+    "subject": "🧠 Issue #3: The Friday Rot Drops (You're Welcome / Sorry)",
+    "scheduledFor": "2026-02-27T08:00:00Z",
+    "sentAt": null,
+    "status": "draft",
+    "content": {
+      "rotReport": [
+        {
+          "title": "Man Goes Viral for Ordering 'Normal Amount' of Chicken Nuggets",
+          "description": "A McDonald's employee posted a TikTok of a customer who ordered, and we quote, 'just a normal, reasonable amount of nuggets — like, what a normal human would eat.' He then ordered 97 nuggets. The video has 28 million views. The employee said he was 'very polite about it.' McDonald's quote-tweeted the video and the man now has a brand deal."
+        },
+        {
+          "title": "Beige Flag Dating Trend Replaces Red Flags, Everyone Is Just Weird Now",
+          "description": "The hottest new dating term is 'beige flags' — not red, not green, just weird quirks that aren't dealbreakers. Examples going viral include: 'eats cereal with orange juice,' 'has a spreadsheet tracking every movie he's cried at,' 'refers to his plants by their full legal names.' The internet has concluded that everyone on Earth has beige flags and this makes us all equally unhinged."
+        },
+        {
+          "title": "AI Chatbot Asked to Write a Cover Letter, Produces Manifesto",
+          "description": "A user asked an AI assistant to write a cover letter for a data entry position. The AI produced a 4,000-word document describing the applicant as 'a once-in-a-generation talent whose gift for data entry transcends mere employment and constitutes a calling.' The hiring manager reportedly forwarded it to HR as a joke. HR called the candidate in for an interview. They got the job."
+        }
+      ],
+      "memeOfTheDay": {
+        "description": "The 'pointing Spider-Man' meme but it's you pointing at yourself in the mirror after doing one (1) productive thing and calling it a 'productive day'",
+        "imageUrl": null
+      },
+      "seriousNewsStupid": {
+        "headline": "Study Finds People Who Make Their Beds Are More Successful",
+        "take": "A new study from a prestigious university has found that people who make their beds every morning report higher productivity, better mental health, and greater career success. The study did not account for the fact that people who have time to make their beds every morning simply have more manageable lives to begin with. The study's lead author makes his bed. The study's co-author, who did all the actual work, does not."
+      },
+      "whoGotCooked": {
+        "who": "That brand that tried to go viral with an 'authentic' social media post",
+        "what": "A Fortune 500 company's social media team posted: 'okay bestie no cap this product goes absolutely crazy fr fr 💀🔥' and the internet collectively cringed so hard it created a seismic event detectable in seven countries. The post got 2 million impressions, every single one of them mocking. The social media manager was reportedly 'given another chance.' The post is still up."
+      },
+      "unhingedFact": "Otters hold hands while sleeping so they don't drift apart. This is called a 'raft.' Also, the shortest war in history lasted 38-45 minutes (Anglo-Zanzibar War, 1896). Also, a day on Venus is longer than a year on Venus. Space is cooked. We're all cooked. Touch grass but not too much because there are like 57 bugs per square inch of grass."
+    },
+    "recipientCount": null
+  }
+]

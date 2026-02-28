@@ -1,0 +1,29 @@
+{
+  "name": "daily-rot",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "vite --port 5176",
+    "dev:backend": "cd server && npm run dev",
+    "build": "vite build && cd server && npm run build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@react-email/components": "^0.0.22",
+    "axios": "^1.7.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-hot-toast": "^2.4.1",
+    "react-router-dom": "^6.23.1",
+    "recharts": "^2.12.7"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "concurrently": "^8.2.2",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.12"
+  }
+}
