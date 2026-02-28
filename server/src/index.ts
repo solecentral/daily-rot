@@ -10,9 +10,30 @@ import articleRoutes from './routes/articles'
 import memeRoutes from './routes/memes'
 
 const app = express()
-const PORT = parseInt(process.env.PORT || '3003', 10)
+const PORT = parseInt(process.env.PORT || '8080', 10)
 
-app.use(cors({ origin: '*' }))
+const allowedOrigins = [
+  'https://getdailyrot.com',
+  'https://www.getdailyrot.com',
+  'https://daily-rot.vercel.app',
+  'http://localhost:5176',
+  'http://localhost:3003',
+]
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(null, true) // allow all for now
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+}))
+
+app.options('*', cors())
 app.use(express.json())
 
 app.use('/api', subscriberRoutes)

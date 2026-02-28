@@ -1,0 +1,23 @@
+[
+  {
+    "id": "sub_001",
+    "email": "degen1@example.com",
+    "subscribedAt": "2026-01-15T10:00:00Z",
+    "unsubscribeToken": "tok_abc123xyz",
+    "active": true
+  },
+  {
+    "id": "sub_002",
+    "email": "brainrot@example.com",
+    "subscribedAt": "2026-01-20T14:30:00Z",
+    "unsubscribeToken": "tok_def456uvw",
+    "active": true
+  },
+  {
+    "id": "sub_003",
+    "email": "sigma@example.com",
+    "subscribedAt": "2026-02-01T09:15:00Z",
+    "unsubscribeToken": "tok_ghi789rst",
+    "active": true
+  }
+]

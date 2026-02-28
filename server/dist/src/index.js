@@ -12,8 +12,28 @@ const issues_1 = __importDefault(require("./routes/issues"));
 const articles_1 = __importDefault(require("./routes/articles"));
 const memes_1 = __importDefault(require("./routes/memes"));
 const app = (0, express_1.default)();
-const PORT = parseInt(process.env.PORT || '3003', 10);
-app.use((0, cors_1.default)({ origin: '*' }));
+const PORT = parseInt(process.env.PORT || '8080', 10);
+const allowedOrigins = [
+    'https://getdailyrot.com',
+    'https://www.getdailyrot.com',
+    'https://daily-rot.vercel.app',
+    'http://localhost:5176',
+    'http://localhost:3003',
+];
+app.use((0, cors_1.default)({
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        }
+        else {
+            callback(null, true); // allow all for now
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+}));
+app.options('*', (0, cors_1.default)());
 app.use(express_1.default.json());
 app.use('/api', subscribers_1.default);
 app.use('/api', issues_1.default);
