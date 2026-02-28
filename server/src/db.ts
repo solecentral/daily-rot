@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { Subscriber, Issue, Article } from './types'
 
-const DATA_DIR = path.join(__dirname, '../data')
+const DATA_DIR = path.join(__dirname, process.env.NODE_ENV === 'production' ? 'data' : '../data')
 
 function readJSON<T>(filename: string): T[] {
   const filePath = path.join(DATA_DIR, filename)
