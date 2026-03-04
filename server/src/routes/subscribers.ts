@@ -17,7 +17,7 @@ async function sendWelcomeEmail(email: string, unsubscribeToken: string) {
     const siteUrl = process.env.SITE_URL || 'https://getdailyrot.com'
     const unsubUrl = `${siteUrl}/unsubscribe?email=${encodeURIComponent(email)}&token=${unsubscribeToken}`
 
-    await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from: `The Daily Rot <${fromEmail}>`,
       to: email,
       subject: '🧠 you just subscribed to something terrible (and we love you for it)',
@@ -59,7 +59,11 @@ async function sendWelcomeEmail(email: string, unsubscribeToken: string) {
         </html>
       `,
     })
-    console.log(`Welcome email sent to: ${email}`)
+    if (error) {
+      console.error(`Resend error for ${email}:`, JSON.stringify(error))
+    } else {
+      console.log(`Welcome email sent to: ${email} | id: ${data?.id}`)
+    }
   } catch (err) {
     console.error('Failed to send welcome email:', err)
   }
