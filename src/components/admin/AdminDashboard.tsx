@@ -5,8 +5,9 @@ import { Issue, Article } from '../../types'
 import { SubscriberStats } from './SubscriberStats'
 import { IssueEditor } from './IssueEditor'
 import { IssuePreview } from '../IssuePreview'
+import { ArticleEditor } from './ArticleEditor'
 
-type View = 'dashboard' | 'new-issue' | 'edit-issue' | 'preview-issue'
+type View = 'dashboard' | 'new-issue' | 'edit-issue' | 'preview-issue' | 'new-article' | 'edit-article'
 type AdminTab = 'issues' | 'articles'
 
 export function AdminDashboard() {
@@ -15,8 +16,12 @@ export function AdminDashboard() {
   const [view, setView] = useState<View>('dashboard')
   const [adminTab, setAdminTab] = useState<AdminTab>('issues')
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null)
+  const [selectedArticle, setSelectedArticle] = useState<Article | null>(null)
   const [sendingId, setSendingId] = useState<string | null>(null)
   const [sendModal, setSendModal] = useState<Issue | null>(null)
+  const [testEmailModal, setTestEmailModal] = useState<Issue | null>(null)
+  const [testEmailAddress, setTestEmailAddress] = useState('')
+  const [sendingTest, setSendingTest] = useState(false)
   const [activeSubCount, setActiveSubCount] = useState<number>(0)
   const [generatingId, setGeneratingId] = useState<string | null>(null)
   const [fetchingMemes, setFetchingMemes] = useState(false)
@@ -90,6 +95,36 @@ export function AdminDashboard() {
     setSelectedIssue(null)
   }
 
+  const handleArticleSaved = (article: Article) => {
+    loadArticles()
+    setView('dashboard')
+    setSelectedArticle(null)
+    setAdminTab('articles')
+  }
+
+  const handleSendTest = async () => {
+    if (!testEmailModal) return
+    if (!testEmailAddress || !testEmailAddress.includes('@')) {
+      toast.error('Enter a valid email address')
+      return
+    }
+    setSendingTest(true)
+    try {
+      await axios.post(`/api/issues/${testEmailModal.id}/send-test`, { email: testEmailAddress })
+      toast.success(`Test email sent to ${testEmailAddress}! 📬`)
+      setTestEmailModal(null)
+      setTestEmailAddress('')
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        toast.error(err.response?.data?.error || 'Test send failed')
+      } else {
+        toast.error('Test send failed')
+      }
+    } finally {
+      setSendingTest(false)
+    }
+  }
+
   if (view === 'new-issue') {
     return (
       <div style={page}>
@@ -130,8 +165,50 @@ export function AdminDashboard() {
     )
   }
 
+  if (view === 'new-article' || view === 'edit-article') {
+    return (
+      <div style={page}>
+        <AdminNav onBack={() => { setView('dashboard'); setSelectedArticle(null) }} title={view === 'new-article' ? 'New Article' : 'Edit Article'} />
+        <div style={content}>
+          <ArticleEditor
+            article={selectedArticle}
+            onSaved={handleArticleSaved}
+            onCancel={() => { setView('dashboard'); setSelectedArticle(null) }}
+          />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div style={page}>
+      {/* Test Email Modal */}
+      {testEmailModal && (
+        <div style={modalOverlay}>
+          <div style={modal}>
+            <h2 style={modalTitle}>📬 Send Test Email</h2>
+            <p style={modalText}>
+              Send a test copy of <strong style={{ color: '#39ff14' }}>{testEmailModal.subject}</strong> to yourself before blasting everyone.
+            </p>
+            <input
+              type="email"
+              value={testEmailAddress}
+              onChange={e => setTestEmailAddress(e.target.value)}
+              placeholder="your@email.com"
+              style={{ ...testEmailInput }}
+              onKeyDown={e => e.key === 'Enter' && handleSendTest()}
+              autoFocus
+            />
+            <div style={modalActions}>
+              <button onClick={() => { setTestEmailModal(null); setTestEmailAddress('') }} style={modalCancelBtn}>Cancel</button>
+              <button onClick={handleSendTest} disabled={sendingTest} style={modalSendBtn}>
+                {sendingTest ? 'Sending...' : '📤 Send Test'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Send Modal */}
       {sendModal && (
         <div style={modalOverlay}>
@@ -223,6 +300,14 @@ export function AdminDashboard() {
                     </button>
                     {issue.status !== 'sent' && (
                       <button
+                        onClick={() => { setTestEmailModal(issue); setTestEmailAddress('') }}
+                        style={testBtn}
+                      >
+                        📤 Test
+                      </button>
+                    )}
+                    {issue.status !== 'sent' && (
+                      <button
                         onClick={() => setSendModal(issue)}
                         disabled={sendingId === issue.id}
                         style={sendBtn}
@@ -243,6 +328,14 @@ export function AdminDashboard() {
         {/* Articles tab */}
         {adminTab === 'articles' && (
           <section style={section}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px' }}>
+              <button
+                onClick={() => { setSelectedArticle(null); setView('new-article') }}
+                style={newIssueBtn}
+              >
+                + New Article
+              </button>
+            </div>
             <div style={issuesList}>
               {articles.map(article => (
                 <div key={article.id} style={issueRow}>
@@ -255,6 +348,12 @@ export function AdminDashboard() {
                     </div>
                   </div>
                   <div style={issueActions}>
+                    <button
+                      onClick={() => { setSelectedArticle(article); setView('edit-article') }}
+                      style={actionBtn}
+                    >
+                      Edit
+                    </button>
                     <a href={`/article/${article.slug}`} target="_blank" rel="noreferrer" style={actionBtn}>
                       View →
                     </a>
@@ -262,7 +361,7 @@ export function AdminDashboard() {
                 </div>
               ))}
               {articles.length === 0 && (
-                <div style={emptyState}>No articles yet. Click "Gen Articles" on any issue.</div>
+                <div style={emptyState}>No articles yet. Click "+ New Article" or "Gen Articles" on any issue.</div>
               )}
             </div>
           </section>
@@ -539,4 +638,30 @@ const fetchMemesBtn: React.CSSProperties = {
   fontSize: '13px',
   fontWeight: '700',
   padding: '8px 16px',
+}
+
+const testBtn: React.CSSProperties = {
+  backgroundColor: '#1a1a2e',
+  border: '1px solid #39ff1455',
+  borderRadius: '5px',
+  color: '#39ff14',
+  cursor: 'pointer',
+  fontFamily: 'inherit',
+  fontSize: '12px',
+  fontWeight: '600',
+  padding: '6px 12px',
+}
+
+const testEmailInput: React.CSSProperties = {
+  backgroundColor: '#0d0d0d',
+  border: '1px solid #2a2a2a',
+  borderRadius: '6px',
+  color: '#fff',
+  fontFamily: 'inherit',
+  fontSize: '14px',
+  padding: '10px 14px',
+  width: '100%',
+  boxSizing: 'border-box' as const,
+  outline: 'none',
+  marginBottom: '20px',
 }

@@ -24,6 +24,39 @@ router.get('/articles/:slug', (req, res) => {
         .slice(0, 3);
     res.json({ ...article, related });
 });
+// POST /api/articles
+router.post('/articles', (req, res) => {
+    const articles = db_1.db.getArticles();
+    const id = `article_${(0, uuid_1.v4)().replace(/-/g, '').slice(0, 12)}`;
+    const title = req.body.title || 'Untitled';
+    const slug = `${id}-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)}`;
+    const article = {
+        id,
+        issueId: req.body.issueId || '',
+        section: req.body.section || 'rotReport',
+        slug,
+        title,
+        content: req.body.content || '',
+        excerpt: req.body.excerpt || '',
+        publishedAt: new Date().toISOString(),
+        views: 0,
+        adSlot: false,
+        memeImageUrl: req.body.memeImageUrl || null,
+    };
+    articles.push(article);
+    db_1.db.saveArticles(articles);
+    res.status(201).json(article);
+});
+// PUT /api/articles/:id
+router.put('/articles/:id', (req, res) => {
+    const articles = db_1.db.getArticles();
+    const idx = articles.findIndex(a => a.id === req.params.id);
+    if (idx === -1)
+        return res.status(404).json({ error: 'Article not found' });
+    articles[idx] = { ...articles[idx], ...req.body, id: articles[idx].id, slug: articles[idx].slug };
+    db_1.db.saveArticles(articles);
+    res.json(articles[idx]);
+});
 // POST /api/articles/generate/:issueId
 router.post('/articles/generate/:issueId', (req, res) => {
     const { issueId } = req.params;

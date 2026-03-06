@@ -100,22 +100,65 @@ router.post('/issues/:id/send', async (req, res) => {
     try {
         const { Resend } = await Promise.resolve().then(() => __importStar(require('resend')));
         const resend = new Resend(process.env.RESEND_API_KEY);
-        const html = await (0, email_1.renderIssueEmail)(issue);
-        const results = await Promise.allSettled(subscribers.map(sub => resend.emails.send({
-            from: process.env.FROM_EMAIL || 'newsletter@yourdomain.com',
-            to: sub.email,
-            subject: issue.subject,
-            html,
-        })));
-        const sent = results.filter(r => r.status === 'fulfilled').length;
+        const siteUrl = process.env.SITE_URL || 'http://localhost:5176';
+        let sent = 0;
+        let failed = 0;
+        const batchSize = 10;
+        for (let i = 0; i < subscribers.length; i += batchSize) {
+            const batch = subscribers.slice(i, i + batchSize);
+            const results = await Promise.allSettled(batch.map(async (sub) => {
+                const unsubscribeUrl = `${siteUrl}/unsubscribe?email=${encodeURIComponent(sub.email)}&token=${sub.unsubscribeToken}`;
+                const html = await (0, email_1.renderIssueEmail)(issue, unsubscribeUrl);
+                return resend.emails.send({
+                    from: process.env.FROM_EMAIL || 'newsletter@yourdomain.com',
+                    to: sub.email,
+                    subject: issue.subject,
+                    html,
+                });
+            }));
+            sent += results.filter(r => r.status === 'fulfilled').length;
+            failed += results.filter(r => r.status === 'rejected').length;
+            if (i + batchSize < subscribers.length) {
+                await new Promise(resolve => setTimeout(resolve, 200));
+            }
+        }
         issue.status = 'sent';
         issue.sentAt = new Date().toISOString();
         issue.recipientCount = sent;
         db_1.db.saveIssues(issues);
-        res.json({ message: `Sent to ${sent} subscribers!`, recipientCount: sent });
+        res.json({ message: `Sent to ${sent} subscribers!`, sent, failed, recipientCount: sent });
     }
     catch (err) {
         res.status(500).json({ error: 'Failed to send', details: String(err) });
+    }
+});
+// POST /api/issues/:id/send-test
+router.post('/issues/:id/send-test', async (req, res) => {
+    const issues = db_1.db.getIssues();
+    const issue = issues.find(i => i.id === req.params.id);
+    if (!issue)
+        return res.status(404).json({ error: 'Issue not found' });
+    const { email } = req.body;
+    if (!email || typeof email !== 'string' || !email.includes('@')) {
+        return res.status(400).json({ error: 'Valid email is required' });
+    }
+    if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === 'your_key_here') {
+        return res.json({ success: true, messageId: 'stub_test_id' });
+    }
+    try {
+        const { Resend } = await Promise.resolve().then(() => __importStar(require('resend')));
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        const html = await (0, email_1.renderIssueEmail)(issue, '#');
+        const result = await resend.emails.send({
+            from: process.env.FROM_EMAIL || 'newsletter@yourdomain.com',
+            to: email,
+            subject: `[TEST] ${issue.subject}`,
+            html,
+        });
+        res.json({ success: true, messageId: result.data?.id || 'sent' });
+    }
+    catch (err) {
+        res.status(500).json({ error: 'Failed to send test email', details: String(err) });
     }
 });
 // POST /api/issues/generate

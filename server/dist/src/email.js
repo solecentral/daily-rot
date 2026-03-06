@@ -34,10 +34,10 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.renderIssueEmail = renderIssueEmail;
-async function renderIssueEmail(issue) {
+async function renderIssueEmail(issue, unsubscribeUrl) {
     const { render } = await Promise.resolve().then(() => __importStar(require('@react-email/components')));
     const React = await Promise.resolve().then(() => __importStar(require('react')));
     const { IssueEmail } = await Promise.resolve().then(() => __importStar(require('../templates/IssueEmail')));
-    const element = React.default.createElement(IssueEmail, { issue });
+    const element = React.default.createElement(IssueEmail, { issue, unsubscribeUrl });
     return render(element);
 }
