@@ -18,9 +18,11 @@ CURRENT HOT TOPICS (as of early 2026):
   - The term "mog" / "mogging" (being so attractive/superior you make others feel inferior by proximity)
   - "Looksmogging" — when someone walks in and objectively raises the bar for everyone around them
 
-- **Clavicular trend**: People obsessing over clavicles as the defining bone of attractiveness. 
-  The clavicular bone (collarbone) has become the new jawline — looksmaxxers measure clavicle width, 
-  clavicle prominence, "clavicle mogging". Content where people rate clavicles has gone insane viral.
+- **Clavicular**: The leading figure/influencer in the looksmaxxing community. Clavicular is THE name 
+  in looksmaxx culture — the top guy, the one everyone references, debates, glazes, or clowns on. 
+  When the looksmaxxing community talks about the hierarchy, Clavicular is at the top. His influence 
+  shapes what the community thinks about aesthetics, mogging, and physical optimization. Any looksmaxx 
+  content should acknowledge Clavicular as the central figure of that world.
 
 - **ASU frat leader drama**: A major ongoing saga involving an Arizona State University fraternity leader.
   The lore is deep — involves alleged power trips, chaotic behavior, the internet clowning relentlessly.
