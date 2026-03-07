@@ -36,6 +36,71 @@ export function ArticlePage() {
     }).catch(() => setLoading(false))
   }, [slug])
 
+  // SEO meta tags
+  useEffect(() => {
+    if (!article) return
+    const siteUrl = 'https://getdailyrot.com'
+    const pageUrl = `${siteUrl}/articles/${article.slug}`
+    const title = `${article.title} | The Daily Rot`
+    const desc = article.excerpt || 'Daily brain rot, memes, and internet culture delivered to your inbox.'
+    const img = `${siteUrl}/og-image.png`
+
+    document.title = title
+
+    function setMeta(nameOrProp: string, content: string, isProp = false) {
+      const attr = isProp ? 'property' : 'name'
+      let el = document.querySelector(`meta[${attr}="${nameOrProp}"]`) as HTMLMetaElement | null
+      if (!el) {
+        el = document.createElement('meta')
+        el.setAttribute(attr, nameOrProp)
+        document.head.appendChild(el)
+      }
+      el.content = content
+    }
+
+    setMeta('description', desc)
+    setMeta('og:title', title, true)
+    setMeta('og:description', desc, true)
+    setMeta('og:url', pageUrl, true)
+    setMeta('og:image', img, true)
+    setMeta('og:type', 'article', true)
+    setMeta('twitter:card', 'summary_large_image')
+    setMeta('twitter:title', title)
+    setMeta('twitter:description', desc)
+    setMeta('twitter:image', img)
+
+    // JSON-LD structured data
+    const ldId = 'article-jsonld'
+    let ldScript = document.getElementById(ldId)
+    if (!ldScript) {
+      ldScript = document.createElement('script')
+      ldScript.id = ldId
+      ldScript.setAttribute('type', 'application/ld+json')
+      document.head.appendChild(ldScript)
+    }
+    ldScript.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: article.title,
+      description: desc,
+      url: pageUrl,
+      image: img,
+      publisher: {
+        '@type': 'Organization',
+        name: 'The Daily Rot',
+        url: siteUrl,
+        logo: { '@type': 'ImageObject', url: `${siteUrl}/og-image.png` },
+      },
+      datePublished: article.createdAt,
+    })
+
+    return () => {
+      document.title = 'The Daily Rot'
+      const ld = document.getElementById(ldId)
+      if (ld) ld.remove()
+    }
+  }, [article])
+
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href)
     setCopied(true)

@@ -60,15 +60,43 @@ export function LandingPage() {
       {/* HERO */}
       <section style={hero}>
         <div style={heroInner}>
-          <div style={eyebrow}>🔥 FREE NEWSLETTER · DAILY BRAIN ROT</div>
+          <div style={eyebrow}>🔥 FREE · DAILY · EXTREMELY ONLINE</div>
           <h1 style={heroTitle}>THE<br />DAILY ROT</h1>
-          <p style={heroTagline}>The newsletter your brain doesn't need but definitely wants.</p>
+          <p style={heroTagline}>daily brain rot, delivered to your inbox.</p>
           <p style={heroCopy}>
-            Daily brain rot, memes, unhinged takes, and the internet at its worst.
-            Free forever. Unsubscribe anytime (but you won't).
+            for the terminally online. looksmaxxing discourse, who got cooked today,
+            unhinged facts, and whatever the internet is absolutely losing its mind over —
+            every day. free forever. no cap.
           </p>
           <div style={signupWrapper}>
             <SignupForm subscriberCount={subscriberCount} size="large" />
+          </div>
+          <p style={socialProofText}>
+            🧠 {subscriberCount.toLocaleString()}+ rot enjoyers and counting
+          </p>
+        </div>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section style={howItWorks}>
+        <h2 style={sectionTitle}>HOW IT WORKS</h2>
+        <div style={stepsRow}>
+          <div style={step}>
+            <div style={stepNum}>01</div>
+            <div style={stepTitle}>subscribe free</div>
+            <div style={stepDesc}>enter your email above. takes 4 seconds. your brain will never be the same.</div>
+          </div>
+          <div style={stepArrow}>→</div>
+          <div style={step}>
+            <div style={stepNum}>02</div>
+            <div style={stepTitle}>get daily rot</div>
+            <div style={stepDesc}>every morning, the freshest internet chaos lands in your inbox. lore included.</div>
+          </div>
+          <div style={stepArrow}>→</div>
+          <div style={step}>
+            <div style={stepNum}>03</div>
+            <div style={stepTitle}>become ungovernable</div>
+            <div style={stepDesc}>you now understand the discourse. you are cooked. you are one of us. fr fr.</div>
           </div>
         </div>
       </section>
@@ -264,6 +292,70 @@ const heroCopy: React.CSSProperties = {
 const signupWrapper: React.CSSProperties = {
   maxWidth: '480px',
   margin: '0 auto',
+}
+
+const socialProofText: React.CSSProperties = {
+  color: '#555',
+  fontSize: '13px',
+  marginTop: '16px',
+  letterSpacing: '0.5px',
+}
+
+const howItWorks: React.CSSProperties = {
+  padding: '60px 20px 80px',
+  maxWidth: '900px',
+  margin: '0 auto',
+  textAlign: 'center',
+}
+
+const stepsRow: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '16px',
+  flexWrap: 'wrap',
+  marginTop: '40px',
+}
+
+const step: React.CSSProperties = {
+  flex: '1',
+  minWidth: '200px',
+  maxWidth: '240px',
+  background: '#111',
+  border: '1px solid #1f1f1f',
+  borderRadius: '10px',
+  padding: '24px 20px',
+  textAlign: 'center',
+}
+
+const stepNum: React.CSSProperties = {
+  color: '#39ff14',
+  fontSize: '32px',
+  fontWeight: '900',
+  fontFamily: 'monospace',
+  marginBottom: '12px',
+  opacity: 0.7,
+}
+
+const stepTitle: React.CSSProperties = {
+  color: '#fff',
+  fontSize: '16px',
+  fontWeight: '700',
+  marginBottom: '10px',
+  textTransform: 'lowercase',
+}
+
+const stepDesc: React.CSSProperties = {
+  color: '#666',
+  fontSize: '13px',
+  lineHeight: '1.6',
+}
+
+const stepArrow: React.CSSProperties = {
+  color: '#333',
+  fontSize: '28px',
+  fontWeight: '300',
+  flexShrink: 0,
 }
 
 const whatsInside: React.CSSProperties = {
