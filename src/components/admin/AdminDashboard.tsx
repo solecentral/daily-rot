@@ -6,9 +6,10 @@ import { SubscriberStats } from './SubscriberStats'
 import { IssueEditor } from './IssueEditor'
 import { IssuePreview } from '../IssuePreview'
 import { ArticleEditor } from './ArticleEditor'
+import { CustomArticleWriter } from './CustomArticleWriter'
 
 type View = 'dashboard' | 'new-issue' | 'edit-issue' | 'preview-issue' | 'new-article' | 'edit-article'
-type AdminTab = 'issues' | 'articles'
+type AdminTab = 'issues' | 'articles' | 'research'
 
 const ADMIN_KEY = 'dailyrot_admin_authed'
 
@@ -286,6 +287,9 @@ export function AdminDashboard() {
           <button onClick={() => setAdminTab('articles')} style={adminTab === 'articles' ? activeTabBtn : tabBtn}>
             📝 Articles {articles.length > 0 && `(${articles.length})`}
           </button>
+          <button onClick={() => setAdminTab('research')} style={adminTab === 'research' ? activeTabBtn : tabBtn}>
+            🔬 AI Writer
+          </button>
           <div style={{ flex: 1 }} />
           <button
             onClick={handleFetchMemes}
@@ -397,6 +401,13 @@ export function AdminDashboard() {
                 <div style={emptyState}>No articles yet. Click "+ New Article" or "Gen Articles" on any issue.</div>
               )}
             </div>
+          </section>
+        )}
+
+        {/* AI Writer / Research tab */}
+        {adminTab === 'research' && (
+          <section style={section}>
+            <CustomArticleWriter adminSecret={sessionStorage.getItem(ADMIN_KEY) || ''} />
           </section>
         )}
       </div>

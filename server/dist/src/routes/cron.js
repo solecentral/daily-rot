@@ -203,75 +203,102 @@ router.post('/daily-issue', requireCronAuth, async (req, res) => {
         issues.unshift(newIssue);
         db_1.db.saveIssues(issues);
         console.log(`[cron] Issue ${issueId} created`);
-        // 3b. Auto-generate articles and backfill slugs into the issue content
+        // 3b. Auto-generate full-length articles using GPT-4o-mini and backfill slugs
         try {
+            const openai = new (require('openai').default)({ apiKey: process.env.OPENAI_API_KEY });
             const { v4: uuid2 } = require('uuid');
-            const siteUrl = process.env.SITE_URL || 'https://getdailyrot.com';
+            async function writeArticle(title, summary, voice) {
+                try {
+                    const resp = await openai.chat.completions.create({
+                        model: 'gpt-4o-mini',
+                        messages: [{
+                                role: 'user',
+                                content: `You are writing for The Daily Rot, an internet culture newsletter with a chaotic, funny, Gen-Z voice.
+
+Write a full article (700-1000 words) about: "${title}"
+Context: ${summary}
+Angle: ${voice}
+
+Include: opening hook, 4 sections with <h2> subheadings, how/why it went viral, reactions, cultural significance, closing hot take.
+Voice: funny, sharp, genuinely informative, very online. End with a mention of The Daily Rot.
+Format: HTML with <p>, <h2>, <strong> tags only.
+
+Return JSON: {"content": "<html>", "excerpt": "one punchy sentence under 160 chars"}`
+                            }],
+                        response_format: { type: 'json_object' },
+                        max_tokens: 2000,
+                        temperature: 0.8,
+                    });
+                    const r = JSON.parse(resp.choices[0].message.content || '{}');
+                    return { content: r.content || `<p>${summary}</p>`, excerpt: r.excerpt || summary.slice(0, 160) };
+                }
+                catch {
+                    return {
+                        content: `<p>${summary}</p><p>This is exactly the kind of thing The Daily Rot was created to document. The internet moves fast. The chaos never stops. Neither do we.</p><p>If you're not already subscribed to The Daily Rot newsletter, you're doing the internet wrong. Subscribe at getdailyrot.com — daily brain rot delivered straight to your inbox, absolutely free.</p>`,
+                        excerpt: summary.slice(0, 160),
+                    };
+                }
+            }
+            // Generate articles for each section in parallel
+            const articleTasks = [
+                ...newIssue.content.rotReport.map(item => ({
+                    section: 'rotReport',
+                    title: item.title,
+                    summary: item.description,
+                    voice: 'chaotic internet culture breakdown — origin, spread, best reactions, cultural moment',
+                    onSlug: (slug) => { item.articleSlug = slug; },
+                })),
+                {
+                    section: 'seriousNews',
+                    title: newIssue.content.seriousNewsStupid.headline,
+                    summary: newIssue.content.seriousNewsStupid.take,
+                    voice: 'real news with unhinged internet lens — the story, online reactions, what it all means',
+                    onSlug: (slug) => { newIssue.content.seriousNewsStupid.articleSlug = slug; },
+                },
+                {
+                    section: 'whoGotCooked',
+                    title: `${newIssue.content.whoGotCooked.who} Got Absolutely Cooked`,
+                    summary: newIssue.content.whoGotCooked.what,
+                    voice: 'full post-mortem of an internet L — what happened, how the internet responded, funniest reactions',
+                    onSlug: (slug) => { newIssue.content.whoGotCooked.articleSlug = slug; },
+                },
+                {
+                    section: 'unhingedFact',
+                    title: "Today's Unhinged Fact Will Destroy Your Group Chat",
+                    summary: newIssue.content.unhingedFact,
+                    voice: 'deep dive into a bizarre fact — history, why it\'s weirder than you think, related unhinged tangents',
+                    onSlug: (slug) => { newIssue.content.unhingedFactSlug = slug; },
+                },
+            ];
             const generatedArticles = [];
-            // Rot Report articles
-            newIssue.content.rotReport.forEach((item, i) => {
+            for (const task of articleTasks) {
+                const { content, excerpt } = await writeArticle(task.title, task.summary, task.voice);
                 const id = `article_${uuid2().replace(/-/g, '').slice(0, 12)}`;
-                const slug = `${id}-${item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)}`;
-                item.articleSlug = slug;
+                const slug = `${id}-${task.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 50)}`;
+                task.onSlug(slug);
                 generatedArticles.push({
-                    slug, section: 'rotReport', title: item.title,
-                    content: `<p>${item.description}</p><p>This moment of internet chaos was documented for posterity by The Daily Rot. We take no responsibility for whatever this does to your brain cells.</p><p>Share this with someone who also has questionable taste in content. They will thank you. Probably.</p>`,
-                    excerpt: item.description.slice(0, 120) + '...',
-                });
-            });
-            // Serious News article
-            const sn = newIssue.content.seriousNewsStupid;
-            const snId = `article_${uuid2().replace(/-/g, '').slice(0, 12)}`;
-            const snSlug = `${snId}-${sn.headline.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)}`;
-            sn.articleSlug = snSlug;
-            generatedArticles.push({
-                slug: snSlug, section: 'seriousNews', title: sn.headline,
-                content: `<p>${sn.headline}</p><p>Our take: ${sn.take}</p><p>Look, we're not journalists. We're not even sure we're people anymore. But we saw this headline and had feelings about it.</p>`,
-                excerpt: sn.take.slice(0, 120) + '...',
-            });
-            // Who Got Cooked article
-            const wgc = newIssue.content.whoGotCooked;
-            const wgcId = `article_${uuid2().replace(/-/g, '').slice(0, 12)}`;
-            const wgcSlug = `${wgcId}-${wgc.who.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)}-got-cooked`;
-            wgc.articleSlug = wgcSlug;
-            generatedArticles.push({
-                slug: wgcSlug, section: 'whoGotCooked', title: `${wgc.who} Got Absolutely Cooked Today`,
-                content: `<p>Today's victim: <strong>${wgc.who}</strong>.</p><p>${wgc.what}</p><p>We document these moments not out of cruelty, but out of a deep journalistic commitment to archiving human behavior at its most chaotic.</p>`,
-                excerpt: `${wgc.who}: ${wgc.what}`.slice(0, 120) + '...',
-            });
-            // Unhinged Fact article
-            const ufId = `article_${uuid2().replace(/-/g, '').slice(0, 12)}`;
-            const ufSlug = `${ufId}-todays-unhinged-fact`;
-            newIssue.content.unhingedFactSlug = ufSlug;
-            generatedArticles.push({
-                slug: ufSlug, section: 'unhingedFact', title: "Today's Unhinged Fact Will Destroy Your Group Chat",
-                content: `<p>${newIssue.content.unhingedFact}</p><p>We found this fact while doom-scrolling at 1am and immediately had to share it with everyone we know. That's the whole thing. That's the article. You're welcome and we're sorry.</p>`,
-                excerpt: newIssue.content.unhingedFact.slice(0, 120) + '...',
-            });
-            // Save articles to DB
-            const existingArticles = db_1.db.getArticles();
-            generatedArticles.forEach(({ slug, section, title, content: articleContent, excerpt }) => {
-                existingArticles.push({
-                    id: slug.split('-')[0] + '_' + slug.split('-')[1],
+                    id,
                     issueId,
-                    section: section,
+                    section: task.section,
                     slug,
-                    title,
-                    content: articleContent,
+                    title: task.title,
+                    content,
                     excerpt,
                     publishedAt: new Date().toISOString(),
                     views: 0,
-                    adSlot: section === 'rotReport' || section === 'seriousNews',
-                    memeImageUrl: section === 'rotReport' ? (memeImageUrl || null) : null,
+                    adSlot: task.section === 'rotReport' || task.section === 'seriousNews',
+                    memeImageUrl: task.section === 'rotReport' ? (memeImageUrl || null) : null,
                 });
-            });
+            }
+            const existingArticles = db_1.db.getArticles();
+            existingArticles.unshift(...generatedArticles);
             db_1.db.saveArticles(existingArticles);
             // Re-save issue with updated slugs
             const issueIdx = issues.findIndex(i => i.id === issueId);
             if (issueIdx >= 0)
                 issues[issueIdx] = newIssue;
             db_1.db.saveIssues(issues);
-            console.log(`[cron] Generated ${generatedArticles.length} articles with slugs`);
+            console.log(`[cron] Generated ${generatedArticles.length} full-length articles`);
         }
         catch (artErr) {
             console.error('[cron] Article generation failed (non-fatal):', artErr);

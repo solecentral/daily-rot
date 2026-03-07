@@ -2,8 +2,64 @@ import { Router, Request, Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 import { db } from '../db'
 import { Article } from '../types'
+import OpenAI from 'openai'
 
 const router = Router()
+
+async function generateFullArticle(
+  title: string,
+  summary: string,
+  section: Article['section'],
+  extra?: string
+): Promise<{ content: string; excerpt: string }> {
+  try {
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+
+    const sectionVoice: Record<Article['section'], string> = {
+      rotReport: 'a chaotic internet culture breakdown — cover how it started, why it spread, the best/worst takes, what it says about us',
+      seriousNews: 'real news but with an extremely online unhinged lens — explain the story, why the internet is losing its mind, the best reactions, what happens next',
+      whoGotCooked: 'a full post-mortem of someone\'s internet L — what they did, how the internet responded, the funniest reactions, whether they can recover',
+      unhingedFact: 'a deep dive into a bizarre fact — the history, why it\'s weirder than you think, tangents, other unhinged related facts',
+    }
+
+    const prompt = `You are writing for The Daily Rot — an internet culture newsletter with a chaotic, funny, Gen-Z voice. Like a mix between peak BuzzFeed longform and a very online person's detailed Twitter thread.
+
+Write a FULL article (minimum 700 words) about: "${title}"
+Summary/context: ${summary}
+${extra ? `Extra context: ${extra}` : ''}
+Style: ${sectionVoice[section]}
+
+Structure your article with:
+- Opening hook (2-3 punchy sentences)
+- 4-5 sections with <h2> subheadings, each 120-180 words
+- Real substance: origin, why it exploded, reactions, discourse, cultural significance, what happens next
+- Closing hot take or call to action mentioning The Daily Rot newsletter
+- Voice: funny, sharp, informed, never corporate
+
+Return ONLY valid JSON:
+{"content": "<full HTML with p and h2 and strong tags>", "excerpt": "one punchy sentence under 160 chars"}`
+
+    const resp = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'user', content: prompt }],
+      response_format: { type: 'json_object' },
+      max_tokens: 2500,
+      temperature: 0.8,
+    })
+
+    const result = JSON.parse(resp.choices[0].message.content || '{}')
+    return {
+      content: result.content || `<p>${summary}</p>`,
+      excerpt: result.excerpt || summary.slice(0, 160),
+    }
+  } catch {
+    // Fallback: template-based long content
+    return {
+      content: `<p>${summary}</p><p>This moment of pure internet chaos was so unhinged that The Daily Rot had to document it for posterity. The kind of thing you screenshot and send to three different group chats with zero context. The kind of thing that makes you close your phone, stare at the ceiling for 30 seconds, and then immediately open it back up to show someone else.</p><p>We live in a time when the internet moves faster than any human brain can process. What used to take weeks to become a meme takes hours now. What used to take hours takes minutes. By the time you're reading this, there's already a new layer to this story. That's the rot. That's the daily rot.</p><p>If you're not subscribed to The Daily Rot newsletter yet, what are you even doing. Get in here. We cover this kind of thing every single day and somehow make it worse. Subscribe at getdailyrot.com. Your brain cells are already gone — might as well have fun on the way out.</p>`,
+      excerpt: summary.slice(0, 160),
+    }
+  }
+}
 
 // GET /api/articles
 router.get('/articles', (_req: Request, res: Response) => {
@@ -67,28 +123,24 @@ router.put('/articles/:id', (req: Request, res: Response) => {
 })
 
 // POST /api/articles/generate/:issueId
-router.post('/articles/generate/:issueId', (req: Request, res: Response) => {
+// Uses GPT-4o-mini for full-length articles on each section
+router.post('/articles/generate/:issueId', async (req: Request, res: Response) => {
   const { issueId } = req.params
   const issues = db.getIssues()
   const issue = issues.find(i => i.id === issueId)
   if (!issue) return res.status(404).json({ error: 'Issue not found' })
 
   const articles = db.getArticles()
-  const siteUrl = process.env.SITE_URL || 'http://localhost:5176'
-
   const newArticles: Article[] = []
 
-  // Generate articles from issue content
-  const sections: Array<{ section: Article['section']; title: string; content: string; excerpt: string }> = []
+  const sections: Array<{ section: Article['section']; title: string; summary: string; extra?: string }> = []
 
-  // Rot Report → rotReport articles
-  issue.content.rotReport.forEach((item, i) => {
-    const slug = `${issueId}-rot-${i + 1}-${item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)}`
+  // Rot Report → one article per item
+  issue.content.rotReport.forEach(item => {
     sections.push({
       section: 'rotReport',
       title: item.title,
-      content: `<p>${item.description}</p><p>This moment of internet chaos was documented for posterity by The Daily Rot. We take no responsibility for whatever this does to your brain cells.</p><p>Share this with someone who also has questionable taste in content. They will thank you. Probably. Actually maybe don't do that, just subscribe to The Daily Rot at <a href="${siteUrl}">${siteUrl}</a> and let them find their own way here.</p>`,
-      excerpt: item.description.slice(0, 120) + '...',
+      summary: item.description,
     })
   })
 
@@ -96,30 +148,31 @@ router.post('/articles/generate/:issueId', (req: Request, res: Response) => {
   sections.push({
     section: 'seriousNews',
     title: issue.content.seriousNewsStupid.headline,
-    content: `<p>${issue.content.seriousNewsStupid.headline}</p><p>Our take: ${issue.content.seriousNewsStupid.take}</p><p>Look, we're not journalists. We're not even sure we're people anymore — we've been on the internet too long. But we saw this headline and we had feelings about it, and those feelings have been lovingly transcribed into this article for your reading pleasure.</p><p>Stay rotted, friends. The world is going to keep being like this regardless.</p>`,
-    excerpt: issue.content.seriousNewsStupid.take.slice(0, 120) + '...',
+    summary: issue.content.seriousNewsStupid.take,
+    extra: issue.content.seriousNewsStupid.headline,
   })
 
   // Who Got Cooked
   sections.push({
     section: 'whoGotCooked',
-    title: `${issue.content.whoGotCooked.who} Got Absolutely Cooked Today`,
-    content: `<p>Today's victim: <strong>${issue.content.whoGotCooked.who}</strong>.</p><p>${issue.content.whoGotCooked.what}</p><p>We document these moments not out of cruelty, but out of a deep journalistic commitment to archiving human behavior at its most chaotic. Also it's funny. Also we have nothing else going on. Mostly it's funny though.</p><p>Pour one out. Or don't. They probably deserved it.</p>`,
-    excerpt: `${issue.content.whoGotCooked.who}: ${issue.content.whoGotCooked.what}`.slice(0, 120) + '...',
+    title: `${issue.content.whoGotCooked.who} Got Absolutely Cooked`,
+    summary: issue.content.whoGotCooked.what,
+    extra: `Subject: ${issue.content.whoGotCooked.who}`,
   })
 
   // Unhinged Fact
   sections.push({
     section: 'unhingedFact',
     title: 'Today\'s Unhinged Fact Will Destroy Your Group Chat',
-    content: `<p>${issue.content.unhingedFact}</p><p>We found this fact while doom-scrolling at 1am and immediately had to share it with everyone we know. That's the whole thing. That's the article. You're welcome and we're sorry.</p><p>Send this to someone you want to ruin. Tag us when they respond with a voice memo of them screaming.</p>`,
-    excerpt: issue.content.unhingedFact.slice(0, 120) + '...',
+    summary: issue.content.unhingedFact,
   })
 
-  sections.forEach(({ section, title, content, excerpt }) => {
+  // Generate full articles with GPT-4o-mini
+  for (const { section, title, summary, extra } of sections) {
+    const { content, excerpt } = await generateFullArticle(title, summary, section, extra)
     const id = `article_${uuidv4().replace(/-/g, '').slice(0, 12)}`
     const slug = `${id}-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)}`
-    const article: Article = {
+    newArticles.push({
       id,
       issueId,
       section,
@@ -131,9 +184,8 @@ router.post('/articles/generate/:issueId', (req: Request, res: Response) => {
       views: 0,
       adSlot: section === 'rotReport' || section === 'seriousNews',
       memeImageUrl: section === 'rotReport' ? (issue.content.memeOfTheDay.imageUrl || null) : null,
-    }
-    newArticles.push(article)
-  })
+    })
+  }
 
   articles.push(...newArticles)
   db.saveArticles(articles)
