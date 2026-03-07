@@ -159,8 +159,22 @@ router.post('/daily-issue', requireCronAuth, async (req, res) => {
         const aiContent = await generateIssueWithAI(redditPosts);
         const subject = aiContent.subject || 'The Daily Rot — Fresh Brain Damage';
         // Pick a real meme image from Reddit posts (prefer direct image URLs)
-        const memeImagePost = redditPosts.find(p => p.imageUrl) || null;
-        const memeImageUrl = memeImagePost?.imageUrl || null;
+        let memeImageUrl = redditPosts.find(p => p.imageUrl)?.imageUrl || null;
+        // Fallback: use meme-api.com if Reddit didn't produce an image
+        if (!memeImageUrl) {
+            try {
+                const fetch = require('node-fetch');
+                const memeResp = await fetch('https://meme-api.com/gimme/memes', {
+                    headers: { 'User-Agent': 'DailyRot/1.0' }
+                });
+                const memeData = await memeResp.json();
+                if (memeData?.url && /\.(jpg|jpeg|png|gif|webp)$/i.test(memeData.url)) {
+                    memeImageUrl = memeData.url;
+                }
+            }
+            catch { /* non-fatal */ }
+        }
+        console.log('[cron] Meme image:', memeImageUrl || 'none found');
         content = {
             rotReport: aiContent.rotReport || [],
             memeOfTheDay: {
