@@ -61,15 +61,21 @@ async function fetchRedditMemes() {
         const fetch = require('node-fetch');
         const subs = ['memes', 'dankmemes', 'me_irl', 'shitposting', 'internetculture'];
         const sub = subs[Math.floor(Math.random() * subs.length)];
-        const r = await fetch(`https://www.reddit.com/r/${sub}/hot.json?limit=10`, {
+        const r = await fetch(`https://www.reddit.com/r/${sub}/hot.json?limit=25`, {
             headers: { 'User-Agent': 'DailyRot/1.0' }
         });
         const data = await r.json();
-        const posts = data?.data?.children?.map((p) => ({
-            title: p.data.title,
-            url: p.data.url,
-        })).filter((p) => p.url && !p.url.includes('v.redd.it')) || [];
-        return posts.slice(0, 5);
+        const posts = data?.data?.children?.map((p) => {
+            const url = p.data.url;
+            const isDirectImage = /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url);
+            const previewUrl = p.data.preview?.images?.[0]?.source?.url?.replace(/&amp;/g, '&');
+            return {
+                title: p.data.title,
+                url,
+                imageUrl: isDirectImage ? url : (previewUrl || null),
+            };
+        }).filter((p) => p.url && !p.url.includes('v.redd.it')) || [];
+        return posts.slice(0, 10);
     }
     catch {
         return [];
@@ -138,14 +144,20 @@ router.post('/daily-issue', requireCronAuth, async (req, res) => {
         let content;
         const aiContent = await generateIssueWithAI(redditPosts);
         const subject = aiContent.subject || 'The Daily Rot — Fresh Brain Damage';
+        // Pick a real meme image from Reddit posts (prefer direct image URLs)
+        const memeImagePost = redditPosts.find(p => p.imageUrl) || null;
+        const memeImageUrl = memeImagePost?.imageUrl || null;
         content = {
             rotReport: aiContent.rotReport || [],
-            memeOfTheDay: aiContent.memeOfTheDay || { description: '', imageUrl: null },
+            memeOfTheDay: {
+                description: aiContent.memeOfTheDay?.description || '',
+                imageUrl: memeImageUrl,
+            },
             seriousNewsStupid: aiContent.seriousNewsStupid || { headline: '', take: '' },
             whoGotCooked: aiContent.whoGotCooked || { who: '', what: '' },
             unhingedFact: aiContent.unhingedFact || '',
         };
-        console.log('[cron] AI content generated:', subject);
+        console.log('[cron] AI content generated:', subject, '| meme image:', memeImageUrl ? 'yes' : 'none');
         // 3. Create issue in DB
         const issues = db_1.db.getIssues();
         const issueNum = issues.length + 1;
@@ -163,6 +175,79 @@ router.post('/daily-issue', requireCronAuth, async (req, res) => {
         issues.unshift(newIssue);
         db_1.db.saveIssues(issues);
         console.log(`[cron] Issue ${issueId} created`);
+        // 3b. Auto-generate articles and backfill slugs into the issue content
+        try {
+            const { v4: uuid2 } = require('uuid');
+            const siteUrl = process.env.SITE_URL || 'https://getdailyrot.com';
+            const generatedArticles = [];
+            // Rot Report articles
+            newIssue.content.rotReport.forEach((item, i) => {
+                const id = `article_${uuid2().replace(/-/g, '').slice(0, 12)}`;
+                const slug = `${id}-${item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)}`;
+                item.articleSlug = slug;
+                generatedArticles.push({
+                    slug, section: 'rotReport', title: item.title,
+                    content: `<p>${item.description}</p><p>This moment of internet chaos was documented for posterity by The Daily Rot. We take no responsibility for whatever this does to your brain cells.</p><p>Share this with someone who also has questionable taste in content. They will thank you. Probably.</p>`,
+                    excerpt: item.description.slice(0, 120) + '...',
+                });
+            });
+            // Serious News article
+            const sn = newIssue.content.seriousNewsStupid;
+            const snId = `article_${uuid2().replace(/-/g, '').slice(0, 12)}`;
+            const snSlug = `${snId}-${sn.headline.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)}`;
+            sn.articleSlug = snSlug;
+            generatedArticles.push({
+                slug: snSlug, section: 'seriousNews', title: sn.headline,
+                content: `<p>${sn.headline}</p><p>Our take: ${sn.take}</p><p>Look, we're not journalists. We're not even sure we're people anymore. But we saw this headline and had feelings about it.</p>`,
+                excerpt: sn.take.slice(0, 120) + '...',
+            });
+            // Who Got Cooked article
+            const wgc = newIssue.content.whoGotCooked;
+            const wgcId = `article_${uuid2().replace(/-/g, '').slice(0, 12)}`;
+            const wgcSlug = `${wgcId}-${wgc.who.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)}-got-cooked`;
+            wgc.articleSlug = wgcSlug;
+            generatedArticles.push({
+                slug: wgcSlug, section: 'whoGotCooked', title: `${wgc.who} Got Absolutely Cooked Today`,
+                content: `<p>Today's victim: <strong>${wgc.who}</strong>.</p><p>${wgc.what}</p><p>We document these moments not out of cruelty, but out of a deep journalistic commitment to archiving human behavior at its most chaotic.</p>`,
+                excerpt: `${wgc.who}: ${wgc.what}`.slice(0, 120) + '...',
+            });
+            // Unhinged Fact article
+            const ufId = `article_${uuid2().replace(/-/g, '').slice(0, 12)}`;
+            const ufSlug = `${ufId}-todays-unhinged-fact`;
+            newIssue.content.unhingedFactSlug = ufSlug;
+            generatedArticles.push({
+                slug: ufSlug, section: 'unhingedFact', title: "Today's Unhinged Fact Will Destroy Your Group Chat",
+                content: `<p>${newIssue.content.unhingedFact}</p><p>We found this fact while doom-scrolling at 1am and immediately had to share it with everyone we know. That's the whole thing. That's the article. You're welcome and we're sorry.</p>`,
+                excerpt: newIssue.content.unhingedFact.slice(0, 120) + '...',
+            });
+            // Save articles to DB
+            const existingArticles = db_1.db.getArticles();
+            generatedArticles.forEach(({ slug, section, title, content: articleContent, excerpt }) => {
+                existingArticles.push({
+                    id: slug.split('-')[0] + '_' + slug.split('-')[1],
+                    issueId,
+                    section: section,
+                    slug,
+                    title,
+                    content: articleContent,
+                    excerpt,
+                    publishedAt: new Date().toISOString(),
+                    views: 0,
+                    adSlot: section === 'rotReport' || section === 'seriousNews',
+                    memeImageUrl: section === 'rotReport' ? (memeImageUrl || null) : null,
+                });
+            });
+            db_1.db.saveArticles(existingArticles);
+            // Re-save issue with updated slugs
+            const issueIdx = issues.findIndex(i => i.id === issueId);
+            if (issueIdx >= 0)
+                issues[issueIdx] = newIssue;
+            db_1.db.saveIssues(issues);
+            console.log(`[cron] Generated ${generatedArticles.length} articles with slugs`);
+        }
+        catch (artErr) {
+            console.error('[cron] Article generation failed (non-fatal):', artErr);
+        }
         // 4. Send to all active subscribers
         const subscribers = db_1.db.getSubscribers().filter(s => s.active);
         console.log(`[cron] Sending to ${subscribers.length} subscribers...`);
