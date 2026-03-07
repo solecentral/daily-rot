@@ -125,7 +125,7 @@ Requirements:
 - Punchy brainrot-coded headline that any looksmaxxer/sigma/gen-z person would immediately click
 - Opening hook: 2-3 sentences that prove you know the lore and pulls people in hard
 - 5-6 sections with <h2> subheadings covering: what this is, the origin/lore, key players/moments, the internet's reaction, the discourse, the hot take
-- Naturally weave in brainrot vernacular (mogged, glazing, gooning, sigma, delulu, fr fr, etc.) AND explain it for newcomers inline
+- Naturally weave in brainrot vernacular (mogged, glazing, gooning, sigma, delulu, cooked, peak, cracked, chopped, unc, method, etc.) AND explain it for newcomers inline — NEVER use "fr fr", "no cap", or filler "like" — those are retired and mark you as unc
 - Connect to current maxxing meta, clavicular discourse, ASU frat drama, sigma/NPC culture wherever it fits
 - Give SPECIFIC details — not vague commentary but actual lore, actual receipts, actual timeline
 - Voice: extremely online friend explaining the lore to the group chat, genuinely funny, never cringe-corporate
