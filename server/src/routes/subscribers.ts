@@ -20,7 +20,13 @@ async function sendWelcomeEmail(email: string, unsubscribeToken: string) {
     const { data, error } = await resend.emails.send({
       from: `The Daily Rot <${fromEmail}>`,
       to: email,
-      subject: '🧠 you just subscribed to something terrible (and we love you for it)',
+      reply_to: fromEmail,
+      subject: 'Welcome to The Daily Rot',
+      headers: {
+        'List-Unsubscribe': `<${unsubUrl}>`,
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+      },
+      text: `Welcome to The Daily Rot\n\nYou're in. Every day you'll get:\n- The Rot Report (top brain rot moments)\n- Meme of the Day\n- Serious News but Make It Stupid\n- Who Got Cooked Today\n- Random Unhinged Fact\n\nRead the latest: ${siteUrl}\n\nTo unsubscribe: ${unsubUrl}`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -31,7 +37,7 @@ async function sendWelcomeEmail(email: string, unsubscribeToken: string) {
           </div>
 
           <div style="background:#111;border:1px solid #222;border-radius:8px;padding:24px;margin-bottom:24px;">
-            <h2 style="color:#ff4444;margin:0 0 16px;">YOU'RE IN, DEGEN. 🔥</h2>
+            <h2 style="color:#39ff14;margin:0 0 16px;">YOU'RE IN.</h2>
             <p style="margin:0 0 16px;line-height:1.6;">
               Welcome to the newsletter that was definitely not written by a functioning adult.
               Every day (when we remember), we'll send you:
@@ -46,8 +52,8 @@ async function sendWelcomeEmail(email: string, unsubscribeToken: string) {
           </div>
 
           <div style="text-align:center;margin-bottom:24px;">
-            <a href="${siteUrl}" style="background:#ff4444;color:#fff;padding:14px 28px;border-radius:6px;text-decoration:none;font-weight:bold;font-size:16px;">
-              READ THE LATEST ISSUE →
+            <a href="${siteUrl}" style="background:#39ff14;color:#0a0a0a;padding:14px 28px;border-radius:6px;text-decoration:none;font-weight:bold;font-size:16px;">
+              Read the Latest Issue
             </a>
           </div>
 
