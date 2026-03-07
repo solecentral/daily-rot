@@ -59,25 +59,39 @@ function requireCronAuth(req, res, next) {
 async function fetchRedditMemes() {
     try {
         const fetch = require('node-fetch');
+        // Use .json endpoint for image-heavy subreddits
         const subs = ['memes', 'dankmemes', 'me_irl', 'shitposting', 'internetculture'];
         const sub = subs[Math.floor(Math.random() * subs.length)];
-        const r = await fetch(`https://www.reddit.com/r/${sub}/hot.json?limit=25`, {
-            headers: { 'User-Agent': 'DailyRot/1.0' }
+        const r = await fetch(`https://www.reddit.com/r/${sub}/hot.json?limit=50`, {
+            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DailyRot/1.0)' }
         });
         const data = await r.json();
-        const posts = data?.data?.children?.map((p) => {
-            const url = p.data.url;
-            const isDirectImage = /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url);
-            const previewUrl = p.data.preview?.images?.[0]?.source?.url?.replace(/&amp;/g, '&');
-            return {
-                title: p.data.title,
-                url,
-                imageUrl: isDirectImage ? url : (previewUrl || null),
-            };
-        }).filter((p) => p.url && !p.url.includes('v.redd.it')) || [];
-        return posts.slice(0, 10);
+        const posts = (data?.data?.children || []).map((p) => {
+            const rawUrl = p.data.url_overridden_by_dest || p.data.url;
+            const isDirectImage = /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(rawUrl);
+            // Try multiple image sources in order of preference
+            let imageUrl = null;
+            if (isDirectImage) {
+                imageUrl = rawUrl;
+            }
+            else if (p.data.preview?.images?.[0]?.source?.url) {
+                // Reddit preview URLs use &amp; encoding
+                imageUrl = p.data.preview.images[0].source.url.replace(/&amp;/g, '&');
+            }
+            else if (p.data.media_metadata) {
+                // Gallery posts
+                const firstMedia = Object.values(p.data.media_metadata)[0];
+                if (firstMedia?.s?.u)
+                    imageUrl = firstMedia.s.u.replace(/&amp;/g, '&');
+                else if (firstMedia?.s?.gif)
+                    imageUrl = firstMedia.s.gif.replace(/&amp;/g, '&');
+            }
+            return { title: p.data.title, url: rawUrl, imageUrl };
+        }).filter((p) => p.url && !p.url.includes('v.redd.it') && !p.url.includes('reddit.com/gallery'));
+        return posts.slice(0, 15);
     }
-    catch {
+    catch (err) {
+        console.error('[cron] Reddit fetch error:', err);
         return [];
     }
 }
