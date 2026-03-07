@@ -118,6 +118,14 @@ export function IssueEmail({ issue, unsubscribeUrl = '#' }: IssueEmailProps) {
               You signed up for this. We're not sorry.
             </Text>
             <Text style={footerLinks}>
+              <Link href="https://instagram.com/getdailyrot" style={unsubLink}>
+                Follow on Instagram
+              </Link>
+              {' · '}
+              <Link href="https://getdailyrot.com" style={unsubLink}>
+                Website
+              </Link>
+              {' · '}
               <Link href={unsubscribeUrl} style={unsubLink}>
                 Unsubscribe (coward)
               </Link>

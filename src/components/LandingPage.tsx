@@ -137,9 +137,11 @@ export function LandingPage() {
         <div style={footerLogo}>THE DAILY ROT</div>
         <p style={footerTagline}>Made with 🧠 and absolutely zero brain cells</p>
         <p style={footerLinks}>
-          <a href="/unsubscribe" style={footerLink}>Unsubscribe</a>
+          <a href="https://instagram.com/getdailyrot" target="_blank" rel="noopener noreferrer" style={footerLink}>Instagram</a>
           {' · '}
           <Link to="/articles" style={footerLink}>Articles</Link>
+          {' · '}
+          <a href="/unsubscribe" style={footerLink}>Unsubscribe</a>
           {' · '}
           <a href="/admin" style={footerLink}>Admin</a>
         </p>
