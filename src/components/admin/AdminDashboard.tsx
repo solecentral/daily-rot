@@ -10,7 +10,38 @@ import { ArticleEditor } from './ArticleEditor'
 type View = 'dashboard' | 'new-issue' | 'edit-issue' | 'preview-issue' | 'new-article' | 'edit-article'
 type AdminTab = 'issues' | 'articles'
 
+const ADMIN_KEY = 'dailyrot_admin_authed'
+
+function AdminLogin({ onAuth }: { onAuth: () => void }) {
+  const [pw, setPw] = useState('')
+  const [err, setErr] = useState(false)
+  const handle = (e: React.FormEvent) => {
+    e.preventDefault()
+    // Password stored in env is checked here client-side; for extra security this also hits /api/admin/verify
+    axios.post('/api/admin/verify', { password: pw })
+      .then(() => { sessionStorage.setItem(ADMIN_KEY, '1'); onAuth() })
+      .catch(() => setErr(true))
+  }
+  return (
+    <div style={{ background: '#0a0a0a', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <form onSubmit={handle} style={{ background: '#111', border: '1px solid #222', borderRadius: 12, padding: 40, minWidth: 320 }}>
+        <div style={{ color: '#39ff14', fontWeight: 900, fontSize: 22, marginBottom: 24, fontFamily: 'Black Ops One, sans-serif' }}>ADMIN ACCESS</div>
+        <input
+          type="password" value={pw} onChange={e => { setPw(e.target.value); setErr(false) }}
+          placeholder="Enter admin password" autoFocus
+          style={{ width: '100%', background: '#0a0a0a', border: `1px solid ${err ? '#ef5350' : '#333'}`, borderRadius: 8, color: '#fff', fontSize: 15, padding: '10px 14px', outline: 'none', boxSizing: 'border-box', marginBottom: 12 }}
+        />
+        {err && <div style={{ color: '#ef5350', fontSize: 13, marginBottom: 12 }}>Wrong password.</div>}
+        <button type="submit" style={{ width: '100%', background: '#39ff14', border: 'none', borderRadius: 8, color: '#0a0a0a', cursor: 'pointer', fontWeight: 800, fontSize: 15, padding: '11px 0' }}>
+          ENTER
+        </button>
+      </form>
+    </div>
+  )
+}
+
 export function AdminDashboard() {
+  const [authed, setAuthed] = useState(() => sessionStorage.getItem(ADMIN_KEY) === '1')
   const [issues, setIssues] = useState<Issue[]>([])
   const [articles, setArticles] = useState<Article[]>([])
   const [view, setView] = useState<View>('dashboard')
@@ -124,6 +155,8 @@ export function AdminDashboard() {
       setSendingTest(false)
     }
   }
+
+  if (!authed) return <AdminLogin onAuth={() => setAuthed(true)} />
 
   if (view === 'new-issue') {
     return (

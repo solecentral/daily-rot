@@ -166,4 +166,13 @@ router.get('/subscribers', (req: Request, res: Response) => {
   res.json(subscribers)
 })
 
+// POST /api/admin/verify
+router.post('/admin/verify', (req: Request, res: Response) => {
+  const { password } = req.body
+  const secret = process.env.ADMIN_SECRET
+  if (!secret) return res.status(500).json({ error: 'ADMIN_SECRET not set' })
+  if (password === secret) return res.json({ ok: true })
+  return res.status(401).json({ error: 'Invalid password' })
+})
+
 export default router
