@@ -156,6 +156,27 @@ router.post('/unsubscribe', (req, res) => {
     db_1.db.saveSubscribers(subscribers);
     res.json({ message: 'Unsubscribed. Your loss. 💔' });
 });
+// DELETE /api/subscribers/:id (admin - soft delete)
+router.delete('/subscribers/:id', (req, res) => {
+    const subscribers = db_1.db.getSubscribers();
+    const sub = subscribers.find(s => s.id === req.params.id);
+    if (!sub) {
+        return res.status(404).json({ error: 'Subscriber not found' });
+    }
+    sub.active = false;
+    db_1.db.saveSubscribers(subscribers);
+    res.json({ message: 'Subscriber deactivated', subscriber: sub });
+});
+// GET /api/subscribers/export (admin - CSV export)
+router.get('/subscribers/export', (req, res) => {
+    const subscribers = db_1.db.getSubscribers();
+    const header = 'email,status,subscribed_at';
+    const rows = subscribers.map(s => `${s.email},${s.active ? 'active' : 'unsubscribed'},${s.subscribedAt}`);
+    const csv = [header, ...rows].join('\n');
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=subscribers.csv');
+    res.send(csv);
+});
 // GET /api/subscribers (admin)
 router.get('/subscribers', (req, res) => {
     const subscribers = db_1.db.getSubscribers();

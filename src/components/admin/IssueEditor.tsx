@@ -68,7 +68,7 @@ export function IssueEditor({ issue, onSaved, onCancel }: IssueEditorProps) {
     }
   }
 
-  const updateRotReport = (i: number, field: 'title' | 'description', value: string) => {
+  const updateRotReport = (i: number, field: 'title' | 'description' | 'articleSlug', value: string) => {
     const updated = [...content.rotReport]
     updated[i] = { ...updated[i], [field]: value }
     setContent({ ...content, rotReport: updated })
@@ -113,6 +113,12 @@ export function IssueEditor({ issue, onSaved, onCancel }: IssueEditorProps) {
                 placeholder="The juicy details..."
                 rows={3}
               />
+              <input
+                value={item.articleSlug || ''}
+                onChange={e => updateRotReport(i, 'articleSlug', e.target.value)}
+                style={slugInput}
+                placeholder="article-slug (optional)"
+              />
             </div>
           </div>
         ))}
@@ -152,6 +158,12 @@ export function IssueEditor({ issue, onSaved, onCancel }: IssueEditorProps) {
           placeholder="Your unhinged take..."
           rows={3}
         />
+        <input
+          value={content.seriousNewsStupid.articleSlug || ''}
+          onChange={e => setContent({ ...content, seriousNewsStupid: { ...content.seriousNewsStupid, articleSlug: e.target.value } })}
+          style={slugInput}
+          placeholder="article-slug (optional)"
+        />
       </div>
 
       {/* Cooked */}
@@ -170,6 +182,12 @@ export function IssueEditor({ issue, onSaved, onCancel }: IssueEditorProps) {
           placeholder="What did they do?"
           rows={3}
         />
+        <input
+          value={content.whoGotCooked.articleSlug || ''}
+          onChange={e => setContent({ ...content, whoGotCooked: { ...content.whoGotCooked, articleSlug: e.target.value } })}
+          style={slugInput}
+          placeholder="article-slug (optional)"
+        />
       </div>
 
       {/* Fact */}
@@ -181,6 +199,12 @@ export function IssueEditor({ issue, onSaved, onCancel }: IssueEditorProps) {
           style={textarea}
           placeholder="The unhinged fact..."
           rows={3}
+        />
+        <input
+          value={content.unhingedFactSlug || ''}
+          onChange={e => setContent({ ...content, unhingedFactSlug: e.target.value })}
+          style={slugInput}
+          placeholder="article-slug (optional)"
         />
       </div>
 
@@ -303,6 +327,15 @@ const saveBtn: React.CSSProperties = {
   fontSize: '14px',
   fontWeight: '800',
   padding: '12px 24px',
+}
+
+const slugInput: React.CSSProperties = {
+  ...input,
+  fontSize: '12px',
+  padding: '6px 10px',
+  color: '#666',
+  fontFamily: 'monospace',
+  borderColor: '#1a1a1a',
 }
 
 const cancelBtn: React.CSSProperties = {
