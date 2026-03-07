@@ -2,9 +2,9 @@ import fs from 'fs'
 import path from 'path'
 import { Subscriber, Issue, Article } from './types'
 
-// Railway has read-only filesystem except /tmp
+// Railway volume is mounted at /data for persistent storage
 const DATA_DIR = process.env.NODE_ENV === 'production'
-  ? '/tmp/data'
+  ? (process.env.DATA_DIR || '/data')
   : path.join(__dirname, '../data')
 
 const SOURCE_DATA_DIR = path.join(__dirname, process.env.NODE_ENV === 'production' ? 'data' : '../data')
