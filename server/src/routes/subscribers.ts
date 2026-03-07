@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 import { db } from '../db'
+import { scheduleDrip } from './drip'
 
 const router = Router()
 
@@ -111,6 +112,7 @@ router.post('/subscribe', async (req: Request, res: Response) => {
 
   // Fire and forget — don't block the response
   sendWelcomeEmail(subscriber.email, subscriber.unsubscribeToken)
+  scheduleDrip(subscriber.email)
 
   res.status(201).json({
     message: 'You\'re in! Your brain will never be the same. 🔥',

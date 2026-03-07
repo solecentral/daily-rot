@@ -36,6 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const uuid_1 = require("uuid");
 const db_1 = require("../db");
+const drip_1 = require("./drip");
 const router = (0, express_1.Router)();
 async function sendWelcomeEmail(email, unsubscribeToken) {
     if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === 'your_key_here') {
@@ -139,6 +140,7 @@ router.post('/subscribe', async (req, res) => {
     db_1.db.saveSubscribers(subscribers);
     // Fire and forget — don't block the response
     sendWelcomeEmail(subscriber.email, subscriber.unsubscribeToken);
+    (0, drip_1.scheduleDrip)(subscriber.email);
     res.status(201).json({
         message: 'You\'re in! Your brain will never be the same. 🔥',
         subscriber,

@@ -10,6 +10,8 @@ import articleRoutes from './routes/articles'
 import memeRoutes from './routes/memes'
 import cronRoutes from './routes/cron'
 import researchRoutes from './routes/research'
+import dripRoutes from './routes/drip'
+import activityRoutes from './routes/activity'
 
 const app = express()
 const PORT = parseInt(process.env.PORT || '8080', 10)
@@ -44,6 +46,8 @@ app.use('/api', articleRoutes)
 app.use('/api', memeRoutes)
 app.use('/api/cron', cronRoutes)
 app.use('/api', researchRoutes)
+app.use('/api/cron', dripRoutes)
+app.use('/api/activity', activityRoutes)
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok' })
