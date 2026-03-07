@@ -8,6 +8,7 @@ import subscriberRoutes from './routes/subscribers'
 import issueRoutes from './routes/issues'
 import articleRoutes from './routes/articles'
 import memeRoutes from './routes/memes'
+import cronRoutes from './routes/cron'
 
 const app = express()
 const PORT = parseInt(process.env.PORT || '8080', 10)
@@ -40,6 +41,7 @@ app.use('/api', subscriberRoutes)
 app.use('/api', issueRoutes)
 app.use('/api', articleRoutes)
 app.use('/api', memeRoutes)
+app.use('/api/cron', cronRoutes)
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok' })

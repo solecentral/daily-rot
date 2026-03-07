@@ -6,9 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.db = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
-// Railway has read-only filesystem except /tmp
+// Railway volume is mounted at /data for persistent storage
 const DATA_DIR = process.env.NODE_ENV === 'production'
-    ? '/tmp/data'
+    ? (process.env.DATA_DIR || '/data')
     : path_1.default.join(__dirname, '../data');
 const SOURCE_DATA_DIR = path_1.default.join(__dirname, process.env.NODE_ENV === 'production' ? 'data' : '../data');
 function ensureDataDir() {

@@ -11,6 +11,7 @@ const subscribers_1 = __importDefault(require("./routes/subscribers"));
 const issues_1 = __importDefault(require("./routes/issues"));
 const articles_1 = __importDefault(require("./routes/articles"));
 const memes_1 = __importDefault(require("./routes/memes"));
+const cron_1 = __importDefault(require("./routes/cron"));
 const app = (0, express_1.default)();
 const PORT = parseInt(process.env.PORT || '8080', 10);
 const allowedOrigins = [
@@ -39,6 +40,7 @@ app.use('/api', subscribers_1.default);
 app.use('/api', issues_1.default);
 app.use('/api', articles_1.default);
 app.use('/api', memes_1.default);
+app.use('/api/cron', cron_1.default);
 app.get('/health', (_req, res) => {
     res.json({ status: 'ok' });
 });
