@@ -67,7 +67,9 @@ export function IssueEmail({ issue, unsubscribeUrl = '#' }: IssueEmailProps) {
                 style={memeImg}
               />
             )}
-            <Text style={memeDesc}>{content.memeOfTheDay.description}</Text>
+            {!content.memeOfTheDay.imageUrl && (
+              <Text style={memeDesc}>{content.memeOfTheDay.description}</Text>
+            )}
           </Section>
 
           {/* Serious News But Make It Stupid */}

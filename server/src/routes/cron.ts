@@ -12,6 +12,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { db } from '../db'
 import { renderIssueEmail } from '../email'
 import { Issue, Article } from '../types'
+import { BRAINROT_NICHE_CONTEXT } from '../brainrot-context'
 
 const router = Router()
 
@@ -29,7 +30,7 @@ async function fetchRedditMemes(): Promise<Array<{ title: string; url: string; i
   try {
     const fetch = require('node-fetch')
     // Use .json endpoint for image-heavy subreddits
-    const subs = ['memes', 'dankmemes', 'me_irl', 'shitposting', 'internetculture']
+    const subs = ['Looksmaxxing', 'mewing', 'LivestreamFail', 'GenZ', 'teenagers', 'TikTokCringe', 'okbuddyretard', 'shitposting', 'InternetDrama', 'dankmemes']
     const sub = subs[Math.floor(Math.random() * subs.length)]
     const r = await fetch(`https://www.reddit.com/r/${sub}/hot.json?limit=50`, {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DailyRot/1.0)' }
@@ -85,32 +86,37 @@ async function generateIssueWithAI(redditPosts: Array<{ title: string; url: stri
     ? `Today's trending Reddit posts:\n${redditPosts.map((p, i) => `${i + 1}. "${p.title}"`).join('\n')}`
     : 'No Reddit data available — generate fresh brainrot content'
 
-  const prompt = `You are the writer for "The Daily Rot" — a chaotic, funny, brainrot internet newsletter for Gen Z / millennials.
+  const prompt = `You are the head writer for "The Daily Rot" — a deeply brainrot internet culture newsletter. You are extremely online and deeply embedded in the current brainrot niche.
+
+${BRAINROT_NICHE_CONTEXT}
 
 ${redditContext}
 
-Generate a complete newsletter issue in this EXACT JSON format (no markdown, raw JSON only):
+Generate a complete newsletter issue focused on CURRENT BRAINROT CULTURE. Prioritize: maxxing discourse (looksmaxxing, retardmaxxing, jestermaxxing, jestergooning), clavicular obsession, ASU frat drama, sigma/NPC culture, gooning, mogging. Mix in viral Reddit/TikTok moments from the context above when relevant.
+
+Use the EXACT JSON format below. Voice: extremely online, brainrot vernacular naturally mixed with explanations for normies, genuinely funny and specific (not generic internet speak):
+
 {
-  "subject": "a short punchy newsletter subject line (no emojis, <60 chars)",
-  "preview": "preview text for email clients (<90 chars)",
+  "subject": "punchy brainrot subject line under 60 chars — sounds like a text from your most online friend",
+  "preview": "preview text under 90 chars, equally cracked",
   "rotReport": [
-    { "title": "Short headline of a real viral internet moment", "description": "2-3 sentences of chaotic commentary on it, lowercase, gen z voice" },
-    { "title": "Second viral moment", "description": "2-3 sentences" },
-    { "title": "Third viral moment", "description": "2-3 sentences" }
+    { "title": "Specific headline about a brainrot/looksmaxx/sigma/mog/drama moment — be specific not generic", "description": "2-3 sentences in brainrot voice — use the vernacular naturally, explain lore for newcomers inline" },
+    { "title": "Second specific brainrot moment", "description": "2-3 sentences" },
+    { "title": "Third moment — can be from Reddit context above if brainrot relevant", "description": "2-3 sentences" }
   ],
   "memeOfTheDay": {
-    "description": "1-2 sentences describing today's vibe meme — something relatable and cursed",
+    "description": "1 sentence brainrot caption — used as fallback only if no image loads",
     "imageUrl": null
   },
   "seriousNewsStupid": {
-    "headline": "A real-sounding serious news headline (slightly absurd)",
-    "take": "2-3 sentences of completely unhinged take on it, lowercase, as if written by someone who has been online too long"
+    "headline": "Real or real-adjacent headline filtered through brainrot lens",
+    "take": "2-3 sentences completely cooked take — looksmaxx/sigma/NPC angle where possible, lowercase, extremely online"
   },
   "whoGotCooked": {
-    "who": "Name of a brand/person/entity that got roasted online today",
-    "what": "2-3 sentences describing what happened and why the internet cooked them"
+    "who": "Person/brand/entity that got absolutely cooked — prioritize current brainrot lore (ASU frat, clavicular discourse, looksmaxx fails, etc.)",
+    "what": "2-3 sentences of what happened, in brainrot voice — actual lore and specifics"
   },
-  "unhingedFact": "One genuinely bizarre but true-sounding fact that would destroy any group chat. Make it specific and weird."
+  "unhingedFact": "One specific, genuinely unhinged fact related to looksmaxxing, body modification, sigma behavior, or internet culture. The kind of thing that makes someone's jaw drop and immediately screenshot it."
 }
 
 Rules:
@@ -207,17 +213,23 @@ router.post('/daily-issue', requireCronAuth, async (req: Request, res: Response)
             model: 'gpt-4o-mini',
             messages: [{
               role: 'user',
-              content: `You are writing for The Daily Rot, an internet culture newsletter with a chaotic, funny, Gen-Z voice.
+              content: `You are writing for The Daily Rot — a deeply brainrot internet culture newsletter. You are extremely online.
+
+${BRAINROT_NICHE_CONTEXT}
 
 Write a full article (700-1000 words) about: "${title}"
 Context: ${summary}
 Angle: ${voice}
 
-Include: opening hook, 4 sections with <h2> subheadings, how/why it went viral, reactions, cultural significance, closing hot take.
-Voice: funny, sharp, genuinely informative, very online. End with a mention of The Daily Rot.
-Format: HTML with <p>, <h2>, <strong> tags only.
-
-Return JSON: {"content": "<html>", "excerpt": "one punchy sentence under 160 chars"}`
+Requirements:
+- Opening hook that proves you know the lore, written in brainrot voice
+- 4 sections with <h2> subheadings: what it is, the lore/timeline, internet reactions, hot take
+- Mix brainrot vernacular naturally with explanations for normies (maxxing, mogging, gooning, sigma, etc.)
+- Connect to current brainrot meta: maxxing culture, clavicular obsession, ASU drama where it fits
+- Be SPECIFIC, not vague — real lore, real receipts, real timeline
+- End with hot take + The Daily Rot subscribe CTA
+Format: HTML with <p>, <h2>, <strong> only. Flowing prose.
+Return JSON: {"content": "<html>", "excerpt": "one brainrot-coded punchy sentence under 160 chars"}`
             }],
             response_format: { type: 'json_object' },
             max_tokens: 2000,

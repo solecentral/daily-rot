@@ -13,6 +13,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { db } from '../db'
 import { Article } from '../types'
 import OpenAI from 'openai'
+import { BRAINROT_NICHE_CONTEXT, ARTICLE_SUBREDDITS } from '../brainrot-context'
 
 const router = Router()
 
@@ -31,12 +32,7 @@ function requireAuth(req: Request, res: Response, next: () => void) {
 async function fetchTrendingFromReddit(): Promise<Array<{ title: string; url: string; subreddit: string; score: number; imageUrl?: string }>> {
   try {
     const fetch = require('node-fetch')
-    const brainrotSubs = [
-      'memes', 'dankmemes', 'me_irl', 'shitposting', 'internetculture',
-      'hasan_piker', 'LivestreamFail', 'okbuddyretard', 'teenagers',
-      'GenZ', 'TikTokCringe', 'cringe', 'TrueOffMyChest', 'AITA',
-      'tifu', 'unpopularopinion', 'OutOfTheLoop', 'ExplainTheJoke'
-    ]
+    const brainrotSubs = ARTICLE_SUBREDDITS
     const results: Array<{ title: string; url: string; subreddit: string; score: number; imageUrl?: string }> = []
 
     // Fetch from 3 random subs for variety
@@ -74,10 +70,11 @@ async function searchTrendingTopics(): Promise<string[]> {
   // (no API key needed)
   const fetch = require('node-fetch')
   const queries = [
-    'trending tiktok meme 2026',
-    'viral twitter drama this week',
-    'instagram reels trend brainrot',
-    'what is everyone talking about online today',
+    'looksmaxxing trend tiktok 2026 viral',
+    'jestermaxxing retardmaxxing meme 2026',
+    'clavicular trend looksmax collarbone viral',
+    'ASU frat drama 2026 twitter viral',
+    'sigma NPC brainrot trending',
   ]
   const topics: string[] = []
 
@@ -114,30 +111,33 @@ async function writeFullArticle(topic: string, context: string, section: Article
     unhingedFact: 'a bizarre, surprising, or deeply unhinged fact from anywhere',
   }
 
-  const prompt = `You are a writer for The Daily Rot — a brainrot internet culture newsletter with a chaotic, funny, Gen-Z voice. Think of a mix between BuzzFeed at its peak and a very online person's Twitter thread.
+  const prompt = `You are a writer for The Daily Rot — a deeply brainrot internet culture newsletter. You are the most online person alive.
+
+${BRAINROT_NICHE_CONTEXT}
 
 Topic: ${topic}
-Section: ${sectionContext[section]}
-Additional context: ${context}
+Angle: ${sectionContext[section]}
+Research context: ${context}
 
-Write a FULL-LENGTH article (minimum 700 words, target 900-1200 words) about this topic. 
+Write a FULL-LENGTH article (minimum 800 words, target 1000-1200 words) that is DEEPLY embedded in the brainrot niche.
 
-Structure:
-- A punchy, SEO-friendly headline (not boring, make it cracked)
-- An opening hook paragraph that grabs immediately (2-3 sentences max, very punchy)
-- 4-6 substantive body sections with bolded subheadings, each 100-200 words
-- Cover: how/where it started, why it exploded, the best reactions, the discourse/drama around it, what it means for the culture, where it's going
-- Real talk: why people actually care about this
-- A closing section that's either a hot take, a call to action ("subscribe to The Daily Rot"), or a funny prediction
-- Throughout: maintain the newsletter's voice — chaotic, funny, genuinely informative, never corporate
+Requirements:
+- Punchy brainrot-coded headline that any looksmaxxer/sigma/gen-z person would immediately click
+- Opening hook: 2-3 sentences that prove you know the lore and pulls people in hard
+- 5-6 sections with <h2> subheadings covering: what this is, the origin/lore, key players/moments, the internet's reaction, the discourse, the hot take
+- Naturally weave in brainrot vernacular (mogged, glazing, gooning, sigma, delulu, fr fr, etc.) AND explain it for newcomers inline
+- Connect to current maxxing meta, clavicular discourse, ASU frat drama, sigma/NPC culture wherever it fits
+- Give SPECIFIC details — not vague commentary but actual lore, actual receipts, actual timeline
+- Voice: extremely online friend explaining the lore to the group chat, genuinely funny, never cringe-corporate
+- End with a spicy hot take and subscribe to The Daily Rot CTA
 
-Format as HTML with <p>, <strong>, <h2> tags. No markdown. Make it feel like actual good longform internet culture journalism that's also extremely fun to read.
+HTML only: <p>, <h2>, <strong>. Flowing prose. No bullet lists.
 
-Return ONLY a JSON object with these fields:
+Return ONLY JSON:
 {
-  "title": "article headline",
+  "title": "brainrot-coded headline",
   "content": "<full HTML article>",
-  "excerpt": "one-sentence hook for preview (max 160 chars)",
+  "excerpt": "one-sentence brainrot hook under 160 chars",
   "tags": ["tag1", "tag2", "tag3"]
 }`
 
@@ -269,7 +269,7 @@ router.post('/research/custom', requireAuth as any, async (req: Request, res: Re
     let webContext = notes
     try {
       const fetch = require('node-fetch')
-      const encoded = encodeURIComponent(topic + ' meme trend viral 2026')
+      const encoded = encodeURIComponent(topic + ' brainrot looksmaxx viral tiktok 2026 lore')
       const r = await fetch(`https://html.duckduckgo.com/html/?q=${encoded}`, {
         headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DailyRot/1.0)' }
       })

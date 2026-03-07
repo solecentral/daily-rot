@@ -7,6 +7,7 @@ const express_1 = require("express");
 const uuid_1 = require("uuid");
 const db_1 = require("../db");
 const openai_1 = __importDefault(require("openai"));
+const brainrot_context_1 = require("../brainrot-context");
 const router = (0, express_1.Router)();
 async function generateFullArticle(title, summary, section, extra) {
     try {
@@ -17,22 +18,28 @@ async function generateFullArticle(title, summary, section, extra) {
             whoGotCooked: 'a full post-mortem of someone\'s internet L — what they did, how the internet responded, the funniest reactions, whether they can recover',
             unhingedFact: 'a deep dive into a bizarre fact — the history, why it\'s weirder than you think, tangents, other unhinged related facts',
         };
-        const prompt = `You are writing for The Daily Rot — an internet culture newsletter with a chaotic, funny, Gen-Z voice. Like a mix between peak BuzzFeed longform and a very online person's detailed Twitter thread.
+        const prompt = `You are writing for The Daily Rot — a deeply brainrot internet culture newsletter. You are extremely online and fully embedded in the brainrot niche.
+
+${brainrot_context_1.BRAINROT_NICHE_CONTEXT}
 
 Write a FULL article (minimum 700 words) about: "${title}"
 Summary/context: ${summary}
 ${extra ? `Extra context: ${extra}` : ''}
-Style: ${sectionVoice[section]}
+Angle: ${sectionVoice[section]}
 
-Structure your article with:
-- Opening hook (2-3 punchy sentences)
-- 4-5 sections with <h2> subheadings, each 120-180 words
-- Real substance: origin, why it exploded, reactions, discourse, cultural significance, what happens next
-- Closing hot take or call to action mentioning The Daily Rot newsletter
-- Voice: funny, sharp, informed, never corporate
+Requirements:
+- Opening hook that immediately establishes you know the lore — punchy, brainrot-coded, pulls them in
+- 4-5 sections with <h2> subheadings covering: origin/what it is, the lore and key players, the internet's reaction and best moments, the discourse/debate, where it's heading
+- Naturally mix brainrot vernacular (fr fr, no cap, mogged, glazing, cooked, gooning, rizz, delulu, etc.) with real explanation for people new to the lore
+- Reference the maxxing meta, clavicular discourse, ASU frat lore, sigma/NPC culture where it fits
+- SPECIFIC details — not vague "the internet reacted" but WHO, WHAT, exact vibes
+- Voice: most online person in the group chat who actually knows the lore and is genuinely funny
+- End with hot take + subscribe to The Daily Rot
+
+HTML format: <p>, <h2>, <strong> tags only. Flowing prose, no bullet lists.
 
 Return ONLY valid JSON:
-{"content": "<full HTML with p and h2 and strong tags>", "excerpt": "one punchy sentence under 160 chars"}`;
+{"content": "<full HTML>", "excerpt": "one punchy brainrot sentence under 160 chars"}`;
         const resp = await openai.chat.completions.create({
             model: 'gpt-4o-mini',
             messages: [{ role: 'user', content: prompt }],
