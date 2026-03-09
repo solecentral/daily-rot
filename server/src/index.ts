@@ -12,6 +12,7 @@ import cronRoutes from './routes/cron'
 import researchRoutes from './routes/research'
 import dripRoutes from './routes/drip'
 import activityRoutes from './routes/activity'
+import flipsUniversityRoutes from './routes/flips-university'
 
 const app = express()
 const PORT = parseInt(process.env.PORT || '8080', 10)
@@ -48,6 +49,7 @@ app.use('/api/cron', cronRoutes)
 app.use('/api', researchRoutes)
 app.use('/api/cron', dripRoutes)
 app.use('/api/activity', activityRoutes)
+app.use('/api/flips-university', flipsUniversityRoutes)
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok' })
