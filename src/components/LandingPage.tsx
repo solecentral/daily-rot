@@ -78,6 +78,7 @@ export function LandingPage() {
     { text: "i open this before i open my eyes in the morning", name: "jake, 22" },
     { text: "my screen time is cooked but at least i'm informed", name: "priya, 19" },
     { text: "showed this to my therapist. she subscribed.", name: "marcus, 25" },
+    { text: "i just forward this to my group chat and pretend i'm funny. works every time.", name: "aiden, 21" },
   ]
 
   const sections = [
@@ -118,11 +119,11 @@ export function LandingPage() {
           </div>
           <div style={eyebrow}>🔥 FREE · DAILY · EXTREMELY ONLINE</div>
           <h1 style={heroTitle}>THE<br />DAILY ROT</h1>
-          <p style={heroTagline}>the internet's wildest moments. in your inbox. every morning.</p>
+          <p style={heroTagline}>be the funniest person in every group chat. every single morning.</p>
           <p style={heroCopy}>
-            the #1 newsletter for the terminally online. looksmaxxing discourse, who got cooked today,
-            unhinged facts, and whatever the internet is absolutely losing its mind over —
-            every single morning. free forever.
+            5 sections of pure internet chaos — looksmaxxing discourse, who got cooked today,
+            unhinged facts, memes, and whatever the internet is absolutely losing its mind over.
+            takes 3 min to read. free forever. your group chat will thank you.
           </p>
           <div style={signupWrapper}>
             <SignupForm subscriberCount={subscriberCount} size="large" />
@@ -132,6 +133,11 @@ export function LandingPage() {
             <span style={socialProofText}>
               {subscriberCount.toLocaleString()}+ rot enjoyers already subscribed
             </span>
+          </div>
+          <div style={trustRow}>
+            <span style={trustItem}>✅ Free forever</span>
+            <span style={trustItem}>✅ Unsubscribe anytime</span>
+            <span style={trustItem}>✅ No spam, just rot</span>
           </div>
         </div>
       </section>
@@ -186,6 +192,17 @@ export function LandingPage() {
               {latestIssue && renderPreviewSnippet(s.emoji, latestIssue)}
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* MID-PAGE CTA */}
+      <section style={midCta}>
+        <div style={midCtaInner}>
+          <h2 style={midCtaTitle}>STILL SCROLLING? JUST SUBSCRIBE ALREADY.</h2>
+          <p style={midCtaSubtitle}>your inbox is full of boring stuff anyway. let us fix that.</p>
+          <div style={signupWrapper}>
+            <SignupForm subscriberCount={subscriberCount} size="large" />
+          </div>
         </div>
       </section>
 
@@ -421,6 +438,20 @@ const socialProofText: React.CSSProperties = {
   fontWeight: '600',
 }
 
+const trustRow: React.CSSProperties = {
+  display: 'flex',
+  justifyContent: 'center',
+  gap: '20px',
+  marginTop: '12px',
+  flexWrap: 'wrap',
+}
+
+const trustItem: React.CSSProperties = {
+  color: '#555',
+  fontSize: '12px',
+  letterSpacing: '0.3px',
+}
+
 const howItWorks: React.CSSProperties = {
   padding: '60px 20px 80px',
   maxWidth: '900px',
@@ -532,6 +563,36 @@ const featureDesc: React.CSSProperties = {
   fontSize: '13px',
   lineHeight: '1.5',
   margin: '0',
+}
+
+// Mid-page CTA
+const midCta: React.CSSProperties = {
+  padding: '80px 20px',
+  textAlign: 'center',
+  borderTop: '1px solid #1a1a1a',
+  borderBottom: '1px solid #1a1a1a',
+  background: 'linear-gradient(180deg, #0a0a0a 0%, #0f1a0f 50%, #0a0a0a 100%)',
+}
+
+const midCtaInner: React.CSSProperties = {
+  maxWidth: '600px',
+  margin: '0 auto',
+}
+
+const midCtaTitle: React.CSSProperties = {
+  color: '#fff',
+  fontSize: 'clamp(24px, 4vw, 36px)',
+  fontWeight: '900',
+  letterSpacing: '-1px',
+  margin: '0 0 12px',
+  fontFamily: '"Black Ops One", sans-serif',
+}
+
+const midCtaSubtitle: React.CSSProperties = {
+  color: '#666',
+  fontSize: '16px',
+  margin: '0 0 32px',
+  lineHeight: '1.5',
 }
 
 const sampleSection: React.CSSProperties = {
