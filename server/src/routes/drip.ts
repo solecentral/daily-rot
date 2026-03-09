@@ -1,8 +1,18 @@
-import { Router } from 'express'
+import { Router, Request, Response } from 'express'
 import * as fs from 'fs'
 import * as path from 'path'
 
 const router = Router()
+
+// Auth middleware (same as cron routes)
+function requireAuth(req: Request, res: Response, next: () => void) {
+  const secret = process.env.ADMIN_SECRET
+  const provided = req.headers['x-admin-secret'] || req.query.secret
+  if (!secret || provided !== secret) {
+    return res.status(401).json({ error: 'Unauthorized' })
+  }
+  next()
+}
 const DATA_DIR = process.env.DATA_DIR || '/data'
 const DRIP_FILE = path.join(DATA_DIR, 'drip-queue.json')
 
@@ -167,7 +177,7 @@ function buildDay7Html(articles: Array<{title: string; excerpt: string; slug: st
 }
 
 // POST /api/cron/drip — called daily to send due drip emails
-router.post('/drip', async (req, res) => {
+router.post('/drip', requireAuth, async (req, res) => {
   const queue = readQueue()
   const now = Date.now()
   const due = queue.filter(e => !e.sent && e.sendAt <= now)
