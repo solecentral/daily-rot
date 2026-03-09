@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import axios from 'axios'
 import { Link } from 'react-router-dom'
 import { SignupForm } from './SignupForm'
@@ -23,6 +23,8 @@ export function LandingPage() {
   const [latestIssue, setLatestIssue] = useState<Issue | null>(null)
   const [subscriberCount, setSubscriberCount] = useState<number>(1337)
   const [latestArticles, setLatestArticles] = useState<Article[]>([])
+  const [showStickyBar, setShowStickyBar] = useState(false)
+  const heroRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     axios.get('/api/articles').then(r => {
@@ -41,6 +43,43 @@ export function LandingPage() {
     }).catch(() => {})
   }, [])
 
+  // Show sticky bar when hero scrolls out of view
+  useEffect(() => {
+    const handleScroll = () => {
+      if (heroRef.current) {
+        const rect = heroRef.current.getBoundingClientRect()
+        setShowStickyBar(rect.bottom < 0)
+      }
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Countdown to next issue (assumes 9am ET daily)
+  const [timeLeft, setTimeLeft] = useState('')
+  useEffect(() => {
+    const calcTime = () => {
+      const now = new Date()
+      const et = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }))
+      const target = new Date(et)
+      target.setHours(9, 0, 0, 0)
+      if (et >= target) target.setDate(target.getDate() + 1)
+      const diff = target.getTime() - et.getTime()
+      const h = Math.floor(diff / 3600000)
+      const m = Math.floor((diff % 3600000) / 60000)
+      setTimeLeft(`${h}h ${m}m`)
+    }
+    calcTime()
+    const interval = setInterval(calcTime, 60000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const testimonials = [
+    { text: "i open this before i open my eyes in the morning", name: "jake, 22" },
+    { text: "my screen time is cooked but at least i'm informed", name: "priya, 19" },
+    { text: "showed this to my therapist. she subscribed.", name: "marcus, 25" },
+  ]
+
   const sections = [
     { emoji: '🔥', title: 'The Rot Report', desc: 'Top 3 brain rot moments from the internet. Curated with zero journalistic integrity.' },
     { emoji: '🐸', title: 'Meme of the Day', desc: 'One certified banger. No context. Just vibes.' },
@@ -51,6 +90,20 @@ export function LandingPage() {
 
   return (
     <div style={page}>
+      {/* STICKY SUBSCRIBE BAR */}
+      <div style={{
+        ...stickyBar,
+        transform: showStickyBar ? 'translateY(0)' : 'translateY(-100%)',
+        opacity: showStickyBar ? 1 : 0,
+      }}>
+        <div style={stickyBarInner}>
+          <span style={stickyBarText}>🧠 get your daily rot — free forever</span>
+          <div style={stickyBarForm}>
+            <SignupForm size="small" />
+          </div>
+        </div>
+      </div>
+
       {/* NAV */}
       <nav style={nav}>
         <div style={navLogo}>THE DAILY ROT</div>
@@ -58,22 +111,41 @@ export function LandingPage() {
       </nav>
 
       {/* HERO */}
-      <section style={hero}>
+      <section style={hero} ref={heroRef}>
         <div style={heroInner}>
+          <div style={urgencyBadge}>
+            ⚡ NEXT ISSUE DROPS IN {timeLeft} — GET IN BEFORE IT SENDS
+          </div>
           <div style={eyebrow}>🔥 FREE · DAILY · EXTREMELY ONLINE</div>
           <h1 style={heroTitle}>THE<br />DAILY ROT</h1>
-          <p style={heroTagline}>daily brain rot, delivered to your inbox.</p>
+          <p style={heroTagline}>the internet's wildest moments. in your inbox. every morning.</p>
           <p style={heroCopy}>
-            for the terminally online. looksmaxxing discourse, who got cooked today,
+            the #1 newsletter for the terminally online. looksmaxxing discourse, who got cooked today,
             unhinged facts, and whatever the internet is absolutely losing its mind over —
-            every day. free forever. no cap.
+            every single morning. free forever.
           </p>
           <div style={signupWrapper}>
             <SignupForm subscriberCount={subscriberCount} size="large" />
           </div>
-          <p style={socialProofText}>
-            🧠 {subscriberCount.toLocaleString()}+ rot enjoyers and counting
-          </p>
+          <div style={socialProofRow}>
+            <span style={socialProofBadge}>🟢 LIVE</span>
+            <span style={socialProofText}>
+              {subscriberCount.toLocaleString()}+ rot enjoyers already subscribed
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* SOCIAL PROOF / TESTIMONIALS */}
+      <section style={testimonialsSection}>
+        <div style={testimonialsGrid}>
+          {testimonials.map((t, i) => (
+            <div key={i} style={testimonialCard}>
+              <div style={testimonialStars}>★★★★★</div>
+              <p style={testimonialText}>"{t.text}"</p>
+              <p style={testimonialName}>— {t.name}</p>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -96,7 +168,7 @@ export function LandingPage() {
           <div style={step}>
             <div style={stepNum}>03</div>
             <div style={stepTitle}>become ungovernable</div>
-            <div style={stepDesc}>you now understand the discourse. you are cooked. you are one of us. fr fr.</div>
+            <div style={stepDesc}>you now understand the discourse. you are cooked. you are one of us.</div>
           </div>
         </div>
       </section>
@@ -159,6 +231,23 @@ export function LandingPage() {
           </div>
         </section>
       )}
+
+      {/* FINAL CTA — LAST CHANCE */}
+      <section style={finalCta}>
+        <div style={finalCtaInner}>
+          <div style={finalCtaEmoji}>💀</div>
+          <h2 style={finalCtaTitle}>STILL SCROLLING?</h2>
+          <p style={finalCtaText}>
+            your feed is already rotting without us. might as well make it official.
+          </p>
+          <div style={{ maxWidth: '480px', margin: '0 auto' }}>
+            <SignupForm subscriberCount={subscriberCount} size="large" />
+          </div>
+          <p style={finalCtaFomo}>
+            ⚡ next issue drops in {timeLeft} — don't be the one friend who missed it
+          </p>
+        </div>
+      </section>
 
       {/* FOOTER */}
       <footer style={footer}>
@@ -294,11 +383,42 @@ const signupWrapper: React.CSSProperties = {
   margin: '0 auto',
 }
 
+const urgencyBadge: React.CSSProperties = {
+  display: 'inline-block',
+  backgroundColor: '#39ff1418',
+  border: '1px solid #39ff1440',
+  borderRadius: '100px',
+  color: '#39ff14',
+  fontSize: '11px',
+  fontWeight: '700',
+  letterSpacing: '1.5px',
+  padding: '8px 20px',
+  marginBottom: '24px',
+  textTransform: 'uppercase',
+}
+
+const socialProofRow: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '10px',
+  marginTop: '20px',
+}
+
+const socialProofBadge: React.CSSProperties = {
+  backgroundColor: '#39ff1420',
+  borderRadius: '100px',
+  color: '#39ff14',
+  fontSize: '10px',
+  fontWeight: '900',
+  letterSpacing: '1px',
+  padding: '4px 10px',
+}
+
 const socialProofText: React.CSSProperties = {
-  color: '#555',
-  fontSize: '13px',
-  marginTop: '16px',
-  letterSpacing: '0.5px',
+  color: '#888',
+  fontSize: '14px',
+  fontWeight: '600',
 }
 
 const howItWorks: React.CSSProperties = {
@@ -424,6 +544,130 @@ const sampleSection: React.CSSProperties = {
 const previewWrapper: React.CSSProperties = {
   textAlign: 'left',
   marginTop: '32px',
+}
+
+// Sticky subscribe bar
+const stickyBar: React.CSSProperties = {
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  right: 0,
+  zIndex: 200,
+  backgroundColor: '#0a0a0af0',
+  backdropFilter: 'blur(12px)',
+  borderBottom: '1px solid #39ff1440',
+  padding: '10px 20px',
+  transition: 'transform 0.3s ease, opacity 0.3s ease',
+}
+
+const stickyBarInner: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '16px',
+  maxWidth: '700px',
+  margin: '0 auto',
+  flexWrap: 'wrap',
+}
+
+const stickyBarText: React.CSSProperties = {
+  color: '#fff',
+  fontSize: '13px',
+  fontWeight: '700',
+  letterSpacing: '0.5px',
+  whiteSpace: 'nowrap',
+}
+
+const stickyBarForm: React.CSSProperties = {
+  flex: '1',
+  minWidth: '280px',
+  maxWidth: '400px',
+}
+
+// Testimonials
+const testimonialsSection: React.CSSProperties = {
+  padding: '0 20px 60px',
+  maxWidth: '900px',
+  margin: '0 auto',
+}
+
+const testimonialsGrid: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+  gap: '16px',
+}
+
+const testimonialCard: React.CSSProperties = {
+  backgroundColor: '#111',
+  border: '1px solid #1e1e1e',
+  borderRadius: '12px',
+  padding: '24px',
+  textAlign: 'center',
+}
+
+const testimonialStars: React.CSSProperties = {
+  color: '#39ff14',
+  fontSize: '14px',
+  letterSpacing: '2px',
+  marginBottom: '12px',
+}
+
+const testimonialText: React.CSSProperties = {
+  color: '#ccc',
+  fontSize: '14px',
+  fontStyle: 'italic',
+  lineHeight: '1.5',
+  margin: '0 0 12px',
+}
+
+const testimonialName: React.CSSProperties = {
+  color: '#555',
+  fontSize: '12px',
+  fontWeight: '600',
+}
+
+// Final CTA
+const finalCta: React.CSSProperties = {
+  padding: '80px 20px 100px',
+  textAlign: 'center',
+  background: 'linear-gradient(180deg, #0a0a0a 0%, #0f1a0f 50%, #0a0a0a 100%)',
+  borderTop: '1px solid #39ff1420',
+  borderBottom: '1px solid #39ff1420',
+}
+
+const finalCtaInner: React.CSSProperties = {
+  maxWidth: '600px',
+  margin: '0 auto',
+}
+
+const finalCtaEmoji: React.CSSProperties = {
+  fontSize: '64px',
+  marginBottom: '16px',
+}
+
+const finalCtaTitle: React.CSSProperties = {
+  color: '#fff',
+  fontSize: 'clamp(32px, 6vw, 56px)',
+  fontWeight: '900',
+  letterSpacing: '-2px',
+  margin: '0 0 16px',
+  fontFamily: '"Black Ops One", sans-serif',
+}
+
+const finalCtaText: React.CSSProperties = {
+  color: '#888',
+  fontSize: '18px',
+  lineHeight: '1.6',
+  margin: '0 0 40px',
+}
+
+const finalCtaFomo: React.CSSProperties = {
+  color: '#39ff14',
+  fontSize: '13px',
+  fontWeight: '700',
+  letterSpacing: '0.5px',
+  marginTop: '24px',
+  opacity: 0.8,
 }
 
 const footer: React.CSSProperties = {

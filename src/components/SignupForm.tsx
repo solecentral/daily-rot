@@ -39,7 +39,7 @@ export function SignupForm({ subscriberCount, size = 'large' }: SignupFormProps)
           {loading ? 'ROTTING...' : 'ROT MY BRAIN'}
         </button>
       </form>
-      {subscriberCount !== undefined && (
+      {subscriberCount !== undefined && size === 'large' && (
         <p style={counterText}>
           Join <strong style={{ color: '#39ff14' }}>{subscriberCount.toLocaleString()}</strong> other degenerates
         </p>
