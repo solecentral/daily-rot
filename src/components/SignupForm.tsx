@@ -36,12 +36,12 @@ export function SignupForm({ subscriberCount, size = 'large' }: SignupFormProps)
           disabled={loading}
           style={size === 'large' ? btnLarge : btnSmall}
         >
-          {loading ? 'ROTTING...' : 'ROT MY BRAIN'}
+          {loading ? 'ROTTING...' : 'SEND THE ROT 🧠'}
         </button>
       </form>
       {subscriberCount !== undefined && size === 'large' && (
         <p style={counterText}>
-          Join <strong style={{ color: '#39ff14' }}>{subscriberCount.toLocaleString()}</strong> other degenerates
+          <strong style={{ color: '#39ff14' }}>{subscriberCount.toLocaleString()}</strong> brains already rotting — yours next?
         </p>
       )}
     </div>

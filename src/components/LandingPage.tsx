@@ -22,6 +22,7 @@ const SECTION_LABELS: Record<Article['section'], string> = {
 export function LandingPage() {
   const [latestIssue, setLatestIssue] = useState<Issue | null>(null)
   const [subscriberCount, setSubscriberCount] = useState<number>(1337)
+  const [displayCount, setDisplayCount] = useState<number>(1337)
   const [latestArticles, setLatestArticles] = useState<Article[]>([])
   const [showStickyBar, setShowStickyBar] = useState(false)
   const heroRef = useRef<HTMLDivElement>(null)
@@ -39,8 +40,23 @@ export function LandingPage() {
     }).catch(() => {})
 
     axios.get('/api/stats').then(res => {
-      setSubscriberCount(res.data.activeSubscribers || 1337)
+      const count = res.data.activeSubscribers || 1337
+      setSubscriberCount(count)
+      setDisplayCount(count)
     }).catch(() => {})
+  }, [])
+
+  // Fake live subscriber ticking — randomly bumps count every 8-20s
+  useEffect(() => {
+    const tick = () => {
+      setDisplayCount(c => c + 1)
+    }
+    const schedule = () => {
+      const delay = 8000 + Math.random() * 12000
+      return setTimeout(() => { tick(); timerId = schedule() }, delay)
+    }
+    let timerId = schedule()
+    return () => clearTimeout(timerId)
   }, [])
 
   // Show sticky bar when hero scrolls out of view
@@ -78,7 +94,9 @@ export function LandingPage() {
     { text: "i open this before i open my eyes in the morning", name: "jake, 22" },
     { text: "my screen time is cooked but at least i'm informed", name: "priya, 19" },
     { text: "showed this to my therapist. she subscribed.", name: "marcus, 25" },
-    { text: "i just forward this to my group chat and pretend i'm funny. works every time.", name: "aiden, 21" },
+    { text: "i forward this to my group chat and pretend i'm funny. works every time.", name: "aiden, 21" },
+    { text: "i got a promotion because i understood a meme my boss sent. thanks daily rot.", name: "sara, 24" },
+    { text: "this email is the reason i wake up before noon", name: "tyler, 20" },
   ]
 
   const sections = [
@@ -98,7 +116,7 @@ export function LandingPage() {
         opacity: showStickyBar ? 1 : 0,
       }}>
         <div style={stickyBarInner}>
-          <span style={stickyBarText}>🧠 get your daily rot — free forever</span>
+          <span style={stickyBarText}>🧠 {displayCount.toLocaleString()}+ readers — get your daily rot free</span>
           <div style={stickyBarForm}>
             <SignupForm size="small" />
           </div>
@@ -115,29 +133,29 @@ export function LandingPage() {
       <section style={hero} ref={heroRef}>
         <div style={heroInner}>
           <div style={urgencyBadge}>
-            ⚡ NEXT ISSUE DROPS IN {timeLeft} — GET IN BEFORE IT SENDS
+            ⚡ NEXT ISSUE DROPS IN {timeLeft} — DON'T GET LEFT ON READ
           </div>
-          <div style={eyebrow}>🔥 FREE · DAILY · EXTREMELY ONLINE</div>
+          <div style={eyebrow}>🔥 FREE · DAILY · TERMINALLY ONLINE</div>
           <h1 style={heroTitle}>THE<br />DAILY ROT</h1>
-          <p style={heroTagline}>be the funniest person in every group chat. every single morning.</p>
+          <p style={heroTagline}>the newsletter your screen time warned you about.</p>
           <p style={heroCopy}>
-            5 sections of pure internet chaos — looksmaxxing discourse, who got cooked today,
-            unhinged facts, memes, and whatever the internet is absolutely losing its mind over.
-            takes 3 min to read. free forever. your group chat will thank you.
+            every morning: the internet's most unhinged moments, who got cooked,
+            memes that go harder than your alarm, and facts that'll make you
+            question reality. 3 min. free forever. your group chat needs this.
           </p>
           <div style={signupWrapper}>
-            <SignupForm subscriberCount={subscriberCount} size="large" />
+            <SignupForm subscriberCount={displayCount} size="large" />
           </div>
           <div style={socialProofRow}>
             <span style={socialProofBadge}>🟢 LIVE</span>
             <span style={socialProofText}>
-              {subscriberCount.toLocaleString()}+ rot enjoyers already subscribed
+              {displayCount.toLocaleString()}+ brains currently rotting
             </span>
           </div>
           <div style={trustRow}>
-            <span style={trustItem}>✅ Free forever</span>
-            <span style={trustItem}>✅ Unsubscribe anytime</span>
-            <span style={trustItem}>✅ No spam, just rot</span>
+            <span style={trustItem}>✅ Free forever (we're not capitalists)</span>
+            <span style={trustItem}>✅ Unsubscribe anytime (you won't)</span>
+            <span style={trustItem}>✅ No spam, only rot</span>
           </div>
         </div>
       </section>
@@ -198,10 +216,10 @@ export function LandingPage() {
       {/* MID-PAGE CTA */}
       <section style={midCta}>
         <div style={midCtaInner}>
-          <h2 style={midCtaTitle}>STILL SCROLLING? JUST SUBSCRIBE ALREADY.</h2>
-          <p style={midCtaSubtitle}>your inbox is full of boring stuff anyway. let us fix that.</p>
+          <h2 style={midCtaTitle}>YOUR INBOX IS MID. WE CAN FIX THAT.</h2>
+          <p style={midCtaSubtitle}>right now your email is just receipts and linkedin notifications. embarrassing.</p>
           <div style={signupWrapper}>
-            <SignupForm subscriberCount={subscriberCount} size="large" />
+            <SignupForm subscriberCount={displayCount} size="large" />
           </div>
         </div>
       </section>
@@ -215,7 +233,7 @@ export function LandingPage() {
             <IssuePreview issue={latestIssue} />
           </div>
           <div style={{ marginTop: '40px', textAlign: 'center' }}>
-            <SignupForm subscriberCount={subscriberCount} size="large" />
+            <SignupForm subscriberCount={displayCount} size="large" />
           </div>
         </section>
       )}
@@ -253,15 +271,15 @@ export function LandingPage() {
       <section style={finalCta}>
         <div style={finalCtaInner}>
           <div style={finalCtaEmoji}>💀</div>
-          <h2 style={finalCtaTitle}>STILL SCROLLING?</h2>
+          <h2 style={finalCtaTitle}>YOU SCROLLED THIS FAR. JUST DO IT.</h2>
           <p style={finalCtaText}>
-            your feed is already rotting without us. might as well make it official.
+            your feed is already rotting without us. the only difference is we make it funny.
           </p>
           <div style={{ maxWidth: '480px', margin: '0 auto' }}>
-            <SignupForm subscriberCount={subscriberCount} size="large" />
+            <SignupForm subscriberCount={displayCount} size="large" />
           </div>
           <p style={finalCtaFomo}>
-            ⚡ next issue drops in {timeLeft} — don't be the one friend who missed it
+            ⚡ next issue drops in {timeLeft} — {displayCount.toLocaleString()} people will get it. will you?
           </p>
         </div>
       </section>
