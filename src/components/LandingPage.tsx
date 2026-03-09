@@ -137,11 +137,11 @@ export function LandingPage() {
           </div>
           <div style={eyebrow}>🔥 FREE · DAILY · TERMINALLY ONLINE</div>
           <h1 style={heroTitle}>THE<br />DAILY ROT</h1>
-          <p style={heroTagline}>the newsletter your screen time warned you about.</p>
+          <p style={heroTagline}>wake up. open email. understand every meme in your group chat.</p>
           <p style={heroCopy}>
-            every morning: the internet's most unhinged moments, who got cooked,
-            memes that go harder than your alarm, and facts that'll make you
-            question reality. 3 min. free forever. your group chat needs this.
+            the internet moves fast. we watch it so you don't have to.<br />
+            every morning you get: who got cooked ☕ the hardest memes 🐸 unhinged facts 🎲 real news made stupid 📰<br />
+            <span style={{ color: '#39ff14' }}>3 min read · 100% free · forever</span>
           </p>
           <div style={signupWrapper}>
             <SignupForm subscriberCount={displayCount} size="large" />
@@ -153,9 +153,9 @@ export function LandingPage() {
             </span>
           </div>
           <div style={trustRow}>
-            <span style={trustItem}>✅ Free forever (we're not capitalists)</span>
-            <span style={trustItem}>✅ Unsubscribe anytime (you won't)</span>
-            <span style={trustItem}>✅ No spam, only rot</span>
+            <span style={trustItem}>✅ Free forever (seriously, $0)</span>
+            <span style={trustItem}>✅ Unsubscribe in 1 click (you won't tho)</span>
+            <span style={trustItem}>✅ No spam — just rot</span>
           </div>
         </div>
       </section>
@@ -216,8 +216,8 @@ export function LandingPage() {
       {/* MID-PAGE CTA */}
       <section style={midCta}>
         <div style={midCtaInner}>
-          <h2 style={midCtaTitle}>YOUR INBOX IS MID. WE CAN FIX THAT.</h2>
-          <p style={midCtaSubtitle}>right now your email is just receipts and linkedin notifications. embarrassing.</p>
+          <h2 style={midCtaTitle}>EVERYONE IN YOUR GROUP CHAT ALREADY READS THIS.</h2>
+          <p style={midCtaSubtitle}>that one friend who always drops the memes first? yeah, they're subscribed. your inbox is just receipts and linkedin cringe rn. let us fix that.</p>
           <div style={signupWrapper}>
             <SignupForm subscriberCount={displayCount} size="large" />
           </div>
@@ -271,15 +271,15 @@ export function LandingPage() {
       <section style={finalCta}>
         <div style={finalCtaInner}>
           <div style={finalCtaEmoji}>💀</div>
-          <h2 style={finalCtaTitle}>YOU SCROLLED THIS FAR. JUST DO IT.</h2>
+          <h2 style={finalCtaTitle}>YOU'RE STILL HERE? JUST SUBSCRIBE ALREADY.</h2>
           <p style={finalCtaText}>
-            your feed is already rotting without us. the only difference is we make it funny.
+            tomorrow morning {displayCount.toLocaleString()} people will wake up knowing every meme, every beef, every unhinged moment. you could be one of them or you could keep being the last person to get the joke.
           </p>
           <div style={{ maxWidth: '480px', margin: '0 auto' }}>
             <SignupForm subscriberCount={displayCount} size="large" />
           </div>
           <p style={finalCtaFomo}>
-            ⚡ next issue drops in {timeLeft} — {displayCount.toLocaleString()} people will get it. will you?
+            ⚡ next issue drops in {timeLeft} — takes 4 seconds to subscribe. you've already spent longer reading this page.
           </p>
         </div>
       </section>
