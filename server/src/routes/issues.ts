@@ -88,7 +88,7 @@ router.post('/issues/:id/send', async (req: Request, res: Response) => {
           const unsubscribeUrl = `${siteUrl}/unsubscribe?email=${encodeURIComponent(sub.email)}&token=${sub.unsubscribeToken}`
           const html = await renderIssueEmail(issue, unsubscribeUrl)
           return resend.emails.send({
-            from: process.env.FROM_EMAIL || 'newsletter@yourdomain.com',
+            from: `The Daily Rot <${process.env.FROM_EMAIL || 'newsletter@getdailyrot.com'}>`,
             to: sub.email,
             subject: issue.subject,
             html,
@@ -135,7 +135,7 @@ router.post('/issues/:id/send-test', async (req: Request, res: Response) => {
     const html = await renderIssueEmail(issue, '#')
 
     const result = await resend.emails.send({
-      from: process.env.FROM_EMAIL || 'newsletter@yourdomain.com',
+      from: `The Daily Rot <${process.env.FROM_EMAIL || 'newsletter@getdailyrot.com'}>`,
       to: email,
       subject: `[TEST] ${issue.subject}`,
       html,

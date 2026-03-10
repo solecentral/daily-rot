@@ -340,7 +340,7 @@ Return JSON: {"content": "<html>", "excerpt": "one brainrot-coded punchy sentenc
           const html = await renderIssueEmail(newIssue, unsubUrl)
           const plainText = `The Daily Rot — ${subject}\n\nView online: ${siteUrl}\n\nUnsubscribe: ${unsubUrl}`
           return resend.emails.send({
-            from: fromEmail,
+            from: `The Daily Rot <${fromEmail}>`,
             to: sub.email,
             subject,
             html,

@@ -30,9 +30,14 @@ export function IssueEmail({ issue, unsubscribeUrl = '#' }: IssueEmailProps) {
       <Body style={main}>
         {/* Header */}
         <Section style={header}>
-          <Heading style={logo}>THE DAILY ROT</Heading>
+          <Img
+            src={`${siteUrl}/email-logo.png`}
+            alt="The Daily Rot"
+            width={480}
+            height={96}
+            style={logoImg}
+          />
           <Text style={issueTag}>ISSUE #{issueNumber}</Text>
-          <Text style={tagline}>Your daily dose of brain rot, delivered.</Text>
         </Section>
 
         <Container style={container}>
@@ -157,14 +162,10 @@ const header: React.CSSProperties = {
   borderBottom: '2px solid #39ff14',
 }
 
-const logo: React.CSSProperties = {
-  color: '#39ff14',
-  fontSize: '48px',
-  fontWeight: '900',
-  letterSpacing: '-2px',
-  margin: '0',
-  textTransform: 'uppercase',
-  textShadow: '0 0 30px #39ff1480',
+const logoImg: React.CSSProperties = {
+  display: 'block',
+  margin: '0 auto 8px',
+  borderRadius: '6px',
 }
 
 const issueTag: React.CSSProperties = {
@@ -174,13 +175,6 @@ const issueTag: React.CSSProperties = {
   letterSpacing: '4px',
   margin: '8px 0',
   opacity: 0.8,
-}
-
-const tagline: React.CSSProperties = {
-  color: '#888',
-  fontSize: '14px',
-  margin: '0 0 16px',
-  fontStyle: 'italic',
 }
 
 const container: React.CSSProperties = {

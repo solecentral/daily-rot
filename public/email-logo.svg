@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 100" width="480" height="100">
+  <rect width="480" height="100" fill="#0a0a0a"/>
+  <defs>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <!-- Skull icon -->
+  <text x="28" y="68" font-size="48" text-anchor="middle" fill="#39ff14" filter="url(#glow)">💀</text>
+  <!-- THE DAILY ROT wordmark -->
+  <text x="260" y="52" font-family="Arial Black, Impact, sans-serif" font-size="38" font-weight="900" text-anchor="middle" fill="#39ff14" letter-spacing="-1" filter="url(#glow)">THE DAILY ROT</text>
+  <!-- Tagline -->
+  <text x="260" y="74" font-family="Arial, sans-serif" font-size="13" text-anchor="middle" fill="#555" letter-spacing="3">YOUR DAILY DOSE OF BRAIN ROT</text>
+  <!-- Bottom border line -->
+  <line x1="0" y1="98" x2="480" y2="98" stroke="#39ff14" stroke-width="2" opacity="0.6"/>
+</svg>
